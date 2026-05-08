@@ -18,4 +18,4 @@ Create a modern web application that has the following key features.
 
 Out of scope for this project includes:
 
-- Payments of any time.  The system will not collect or disburse funds in any manner.
+- Payments of any type.  The system will not collect or disburse funds in any manner.
