@@ -38,7 +38,7 @@ Applicants can:
 
 
 ### Reviewes
-Reviewerare members of Beaverton Rotary and will be invited to create an account of type 'reviewer' by the site administrator.
+Reviewers are members of Beaverton Rotary and will be invited to create an account of type 'reviewer' by the site administrator.
 
 #### Use Cases
 - Accept inviation to create an account as a 'reviewer'

@@ -1,7 +1,12 @@
 # Platform
 
-The web application should be hosted in a cloud service provider such as Amazon Web Services or Microsoft Azure.
+I would like the web application to be constructed in the following manner:
 
-The web application should focus on the lowest possible cost while maintaining a secure system.  Data should be protect at rest and in transit.
+1. Front end should be hosted in AWS S3 using React and  HTML.
+2. API and Gateway logic should use Python Flask or FastAPI.
+3. Persistent data store should be AWS Dynamo DB.
 
-The application should be mobile friendly, but designed for full desktop use.  
+## Provisioning
+I would like to provision all AWS resources using Terraform.
+
+
