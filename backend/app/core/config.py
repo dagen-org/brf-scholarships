@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     smtp_host: str = "localhost"
     smtp_port: int = 1025
     smtp_from: str = "noreply@brf-scholarships.org"
+    use_ses: bool = False
+    frontend_url: str = "http://localhost:5173"
 
     # CORS
     cors_origins: List[str] = ["http://localhost:5173"]

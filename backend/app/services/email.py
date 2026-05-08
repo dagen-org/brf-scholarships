@@ -1,10 +1,21 @@
 import smtplib
+import boto3
 from email.mime.text import MIMEText
 
 from app.core.config import settings
 
 
 def _send(to: str, subject: str, body: str) -> None:
+    if settings.use_ses:
+        boto3.client("ses", region_name=settings.aws_region).send_email(
+            Source=settings.smtp_from,
+            Destination={"ToAddresses": [to]},
+            Message={
+                "Subject": {"Data": subject},
+                "Body": {"Html": {"Data": body}},
+            },
+        )
+        return
     msg = MIMEText(body, "html")
     msg["Subject"] = subject
     msg["From"] = settings.smtp_from
@@ -32,8 +43,7 @@ def send_password_reset_email(to: str, code: str) -> None:
 
 
 def send_reviewer_invite_email(to: str, token: str) -> None:
-    frontend_url = "http://localhost:5173"
-    invite_link = f"{frontend_url}/accept-invite?token={token}"
+    invite_link = f"{settings.frontend_url}/accept-invite?token={token}"
     _send(
         to,
         "BRF Scholarships — You've been invited as a reviewer",

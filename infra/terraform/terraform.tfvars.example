@@ -1,0 +1,10 @@
+# Copy this file to terraform.tfvars and fill in the values.
+# terraform.tfvars is gitignored — never commit it (it contains the JWT secret).
+
+aws_region       = "us-west-2"
+app_name         = "brf-scholarships"
+environment      = "prod"
+domain_name      = "scholarships.beavertonrotary.org"
+hosted_zone_name = "beavertonrotary.org"
+ses_from_email   = "noreply@beavertonrotary.org"
+jwt_secret_key   = "REPLACE_WITH_LONG_RANDOM_SECRET"
