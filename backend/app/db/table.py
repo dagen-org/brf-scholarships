@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 import boto3
 from functools import lru_cache
-from mypy_boto3_dynamodb.service_resource import Table
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mypy_boto3_dynamodb.service_resource import Table
 
 from app.core.config import settings
 
