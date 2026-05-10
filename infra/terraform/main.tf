@@ -10,11 +10,11 @@ terraform {
   # Config is supplied at `terraform init` time via -backend-config flags.
   # See deploy.md for local usage and the CI workflow for automated usage.
   backend "s3" {
-    bucket         = "brf-scholarships/terraform-state"
+    bucket         = "brf-scholarships"
     key            = "terraform.tfstate"
-    region         = var.aws_region
+    region         = "us-west-2"
     encrypt        = true
-    dynamodb_table = "brf-scholarships-terraform-locks"
+    use_lockfile = true
   }
 }
 

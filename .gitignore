@@ -13,7 +13,8 @@ build/
 # Environment
 .env
 .env.local
-backend/.env
+backend/.env'
+get-docker.sh
 
 # Node
 node_modules/

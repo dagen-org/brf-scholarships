@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import brfLogo from '../images/beaverton-rotary-foundation.png'
 
 export default function PublicNav() {
   const { isAuthenticated, role, logout } = useAuth()
@@ -11,8 +12,8 @@ export default function PublicNav() {
   }
 
   return (
-    <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
-      <Link to="/" className="text-lg font-bold text-blue-800">Beaverton Rotary Scholarships</Link>
+    <nav className="bg-white shadow px-6 h-[120px] flex justify-between items-center">
+      <Link to="/"><img src={brfLogo} alt="Beaverton Rotary Foundation" className="h-20 object-contain" /></Link>
       <div className="flex items-center gap-6 text-sm">
         <Link to="/about" className="text-gray-600 hover:text-blue-700">About</Link>
         {isAuthenticated ? (

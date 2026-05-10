@@ -8,6 +8,11 @@ output "cloudfront_distribution_id" {
   value       = aws_cloudfront_distribution.frontend.id
 }
 
+output "cloudfront_domain" {
+  description = "Add a CNAME record in your DNS: scholarships → this value"
+  value       = aws_cloudfront_distribution.frontend.domain_name
+}
+
 output "frontend_bucket" {
   description = "S3 bucket name for the React frontend"
   value       = aws_s3_bucket.frontend.id
@@ -31,4 +36,33 @@ output "api_gateway_url" {
 output "lambda_function_name" {
   description = "Lambda function name"
   value       = aws_lambda_function.api.function_name
+}
+
+# ── Manual DNS records ────────────────────────────────────────────────────────
+
+output "acm_validation_cname" {
+  description = "Add this CNAME in your DNS provider to issue the TLS certificate"
+  value = [for dvo in aws_acm_certificate.frontend.domain_validation_options : {
+    name  = dvo.resource_record_name
+    type  = dvo.resource_record_type
+    value = dvo.resource_record_value
+  }]
+}
+
+output "ses_verification_txt" {
+  description = "Add this TXT record to verify your SES sending domain"
+  value = {
+    name  = "_amazonses.${local.ses_domain}"
+    type  = "TXT"
+    value = aws_ses_domain_identity.main.verification_token
+  }
+}
+
+output "ses_dkim_cnames" {
+  description = "Add these 3 CNAME records to enable DKIM signing for SES"
+  value = [for token in aws_ses_domain_dkim.main.dkim_tokens : {
+    name  = "${token}._domainkey.${local.ses_domain}"
+    type  = "CNAME"
+    value = "${token}.dkim.amazonses.com"
+  }]
 }

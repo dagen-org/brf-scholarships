@@ -21,11 +21,6 @@ variable "domain_name" {
   type        = string
 }
 
-variable "hosted_zone_name" {
-  description = "Route53 hosted zone name, e.g. beavertonrotary.org"
-  type        = string
-}
-
 variable "ses_from_email" {
   description = "Verified SES sender address, e.g. noreply@beavertonrotary.org"
   type        = string

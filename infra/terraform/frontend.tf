@@ -1,8 +1,3 @@
-data "aws_route53_zone" "main" {
-  name         = var.hosted_zone_name
-  private_zone = false
-}
-
 # ── ACM certificate (must be in us-east-1 for CloudFront) ────────────────────
 
 resource "aws_acm_certificate" "frontend" {
@@ -15,26 +10,12 @@ resource "aws_acm_certificate" "frontend" {
   }
 }
 
-resource "aws_route53_record" "cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.frontend.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  zone_id = data.aws_route53_zone.main.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  records = [each.value.record]
-  ttl     = 60
-}
-
+# No Route53 — validation CNAME must be added manually in your DNS provider.
+# Run `terraform apply -target=aws_acm_certificate.frontend` first, then
+# `terraform output acm_validation_cname` to get the record values.
 resource "aws_acm_certificate_validation" "frontend" {
-  provider                = aws.us_east_1
-  certificate_arn         = aws_acm_certificate.frontend.arn
-  validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.fqdn]
+  provider        = aws.us_east_1
+  certificate_arn = aws_acm_certificate.frontend.arn
 }
 
 # ── Frontend S3 bucket ────────────────────────────────────────────────────────
@@ -183,30 +164,4 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   depends_on = [aws_acm_certificate_validation.frontend]
-}
-
-# ── Route53 ───────────────────────────────────────────────────────────────────
-
-resource "aws_route53_record" "frontend_a" {
-  zone_id = data.aws_route53_zone.main.zone_id
-  name    = var.domain_name
-  type    = "A"
-
-  alias {
-    name                   = aws_cloudfront_distribution.frontend.domain_name
-    zone_id                = aws_cloudfront_distribution.frontend.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "frontend_aaaa" {
-  zone_id = data.aws_route53_zone.main.zone_id
-  name    = var.domain_name
-  type    = "AAAA"
-
-  alias {
-    name                   = aws_cloudfront_distribution.frontend.domain_name
-    zone_id                = aws_cloudfront_distribution.frontend.hosted_zone_id
-    evaluate_target_health = false
-  }
 }
