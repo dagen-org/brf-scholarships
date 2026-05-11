@@ -104,9 +104,9 @@ jobs:
             -backend-config="key=brf-scholarships/terraform.tfstate" \
             -backend-config="region=${{ vars.AWS_REGION }}"
 
-      - name: Terraform apply
-        working-directory: infra/terraform
-        run: terraform apply -auto-approve
+      #- name: Terraform apply
+      #  working-directory: infra/terraform
+      #  run: terraform apply -auto-approve
 
       # ── Build and deploy frontend ─────────────────────────────────────────────
       - uses: actions/setup-node@v4
