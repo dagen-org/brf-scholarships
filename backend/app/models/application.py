@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from typing import Optional, Any
+from typing import Any
 
 
 class ScholarshipType(str, Enum):
