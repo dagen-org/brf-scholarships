@@ -43,11 +43,15 @@ def update_profile(body: UserProfile, current_user: dict = Depends(get_current_u
 
 
 @router.post("/me/change-password")
-def change_password(body: ChangePasswordRequest, current_user: dict = Depends(get_current_user)):
+def change_password(
+    body: ChangePasswordRequest, current_user: dict = Depends(get_current_user)
+):
     user = users_db.get_user(current_user["email"])
     if not verify_password(body.current_password, user["hashed_password"]):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
-    users_db.update_user(current_user["email"], {"hashed_password": hash_password(body.new_password)})
+    users_db.update_user(
+        current_user["email"], {"hashed_password": hash_password(body.new_password)}
+    )
     return {"message": "Password changed"}
 
 
@@ -56,13 +60,15 @@ def invite_reviewer(body: InviteReviewerRequest):
     if users_db.get_user(body.email):
         raise HTTPException(status_code=409, detail="Email already registered")
     token = secrets.token_urlsafe(32)
-    users_db.create_user({
-        "email": body.email,
-        "hashed_password": "",
-        "role": UserRole.reviewer,
-        "email_verified": False,
-        "invite_token": token,
-    })
+    users_db.create_user(
+        {
+            "email": body.email,
+            "hashed_password": "",
+            "role": UserRole.reviewer,
+            "email_verified": False,
+            "invite_token": token,
+        }
+    )
     send_reviewer_invite_email(body.email, token)
     return {"message": "Invitation sent"}
 
@@ -93,7 +99,9 @@ def admin_set_reviewer_password(email: str, body: AdminSetPasswordRequest):
     return {"message": "Password updated"}
 
 
-@router.delete("/reviewers/{email}", dependencies=[Depends(require_admin)], status_code=204)
+@router.delete(
+    "/reviewers/{email}", dependencies=[Depends(require_admin)], status_code=204
+)
 def delete_reviewer(email: str):
     _get_reviewer_or_404(email)
     users_db.delete_user(email)

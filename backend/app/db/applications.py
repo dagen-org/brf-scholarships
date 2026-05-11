@@ -80,13 +80,19 @@ def update_application_status(app_id: str, status: str) -> None:
 
 def get_comments(app_id: str) -> list[dict]:
     resp = get_table().query(
-        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}") & Key("SK").begins_with("COMMENT#"),
+        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}")
+        & Key("SK").begins_with("COMMENT#"),
     )
     return resp.get("Items", [])
 
 
 def add_file_record(
-    app_id: str, file_id: str, filename: str, s3_key: str, content_type: str, uploader: str
+    app_id: str,
+    file_id: str,
+    filename: str,
+    s3_key: str,
+    content_type: str,
+    uploader: str,
 ) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     item = {
@@ -106,7 +112,8 @@ def add_file_record(
 
 def get_files(app_id: str) -> list[dict]:
     resp = get_table().query(
-        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}") & Key("SK").begins_with("FILE#"),
+        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}")
+        & Key("SK").begins_with("FILE#"),
     )
     return resp.get("Items", [])
 

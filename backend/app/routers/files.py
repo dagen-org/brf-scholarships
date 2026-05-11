@@ -33,14 +33,21 @@ def _s3_client():
 
 
 @router.post("/upload-url")
-def get_upload_url(body: PresignedUrlRequest, current_user: dict = Depends(get_current_user)):
+def get_upload_url(
+    body: PresignedUrlRequest, current_user: dict = Depends(get_current_user)
+):
     if body.content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=400, detail="File type not allowed. Use PDF, DOCX, or TXT.")
+        raise HTTPException(
+            status_code=400, detail="File type not allowed. Use PDF, DOCX, or TXT."
+        )
 
     app = apps_db.get_application(body.app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    if current_user["role"] == UserRole.applicant and app["owner_email"] != current_user["email"]:
+    if (
+        current_user["role"] == UserRole.applicant
+        and app["owner_email"] != current_user["email"]
+    ):
         raise HTTPException(status_code=403, detail="Access denied")
 
     file_id = str(uuid.uuid4())
@@ -57,7 +64,14 @@ def get_upload_url(body: PresignedUrlRequest, current_user: dict = Depends(get_c
     )
 
     # Record the file attachment in DynamoDB
-    apps_db.add_file_record(body.app_id, file_id, body.filename, s3_key, body.content_type, current_user["email"])
+    apps_db.add_file_record(
+        body.app_id,
+        file_id,
+        body.filename,
+        s3_key,
+        body.content_type,
+        current_user["email"],
+    )
 
     return {"upload_url": presigned_url, "file_id": file_id, "s3_key": s3_key}
 
@@ -67,6 +81,9 @@ def list_files(app_id: str, current_user: dict = Depends(get_current_user)):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    if current_user["role"] == UserRole.applicant and app["owner_email"] != current_user["email"]:
+    if (
+        current_user["role"] == UserRole.applicant
+        and app["owner_email"] != current_user["email"]
+    ):
         raise HTTPException(status_code=403, detail="Access denied")
     return apps_db.get_files(app_id)

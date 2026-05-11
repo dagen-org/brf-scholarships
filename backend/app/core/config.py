@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     def parse_cors(cls, v):
         if isinstance(v, str):
             import json
+
             return json.loads(v)
         return v
 
