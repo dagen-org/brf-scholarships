@@ -20,6 +20,12 @@ interface Application {
   status: string
   created_at: string
   updated_at: string
+  data?: { first_name?: string; last_name?: string }
+}
+
+function applicantDisplayName(app: Application): string {
+  const name = [app.data?.first_name, app.data?.last_name].filter(Boolean).join(' ')
+  return name || app.owner_email
 }
 
 function windowStatus(w: WindowItem): 'active' | 'upcoming' | 'closed' {
@@ -199,7 +205,12 @@ export default function AdminWindowApplications() {
               <tbody className="divide-y">
                 {applications.map(app => (
                   <tr key={app.app_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-800">{app.owner_email}</td>
+                    <td className="px-4 py-3">
+                      <p className="text-gray-800 font-medium">{applicantDisplayName(app)}</p>
+                      {(app.data?.first_name || app.data?.last_name) && (
+                        <p className="text-xs text-gray-400">{app.owner_email}</p>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-gray-600">
                       {SCHOLARSHIP_LABELS[app.scholarship_type] ?? app.scholarship_type}
                     </td>

@@ -826,7 +826,10 @@ export default function ApplicationForm() {
           <div className="bg-white rounded-xl shadow px-5 py-4 flex flex-wrap items-center gap-3">
             <div className="flex-1">
               <p className="text-xs text-gray-400">{window_.name}</p>
-              <h2 className="text-base font-semibold text-gray-800">{TYPE_LABELS[type] ?? type} Scholarship Application</h2>
+              <h2 className="text-base font-semibold text-gray-800">
+                {[String(data.first_name ?? ''), String(data.last_name ?? '')].filter(Boolean).join(' ') || (TYPE_LABELS[type] ?? type)}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">{TYPE_LABELS[type] ?? type} Scholarship Application</p>
             </div>
             <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[app.status] ?? 'bg-gray-100 text-gray-600'}`}>
               {app.status.replace('_', ' ')}
