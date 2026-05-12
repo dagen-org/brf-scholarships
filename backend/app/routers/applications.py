@@ -1,6 +1,8 @@
+from datetime import date as date_type
+
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import get_current_user, require_reviewer_or_admin
+from app.core.deps import get_current_user, require_admin, require_reviewer_or_admin
 from app.db import applications as apps_db
 from app.db import windows as windows_db
 from app.models.application import (
@@ -22,7 +24,6 @@ def create_application(
             status_code=403, detail="Only applicants can create applications"
         )
 
-    # Enforce one active application per applicant
     existing = apps_db.get_applications_by_user(current_user["email"])
     if any(a["status"] in ("draft", "submitted") for a in existing):
         raise HTTPException(
@@ -49,12 +50,32 @@ def get_applications_for_window(window_id: str):
     return apps_db.get_applications_by_window(window_id)
 
 
+@router.post(
+    "/window/{window_id}/close",
+    dependencies=[Depends(require_admin)],
+)
+def close_window_applications(window_id: str):
+    """Auto-submit all draft applications for a closed window."""
+    window = windows_db.get_window(window_id)
+    if not window:
+        raise HTTPException(status_code=404, detail="Window not found")
+    today = date_type.today().isoformat()
+    if window["end_date"] >= today:
+        raise HTTPException(status_code=400, detail="Window has not yet closed")
+    apps = apps_db.get_applications_by_window(window_id)
+    count = 0
+    for app in apps:
+        if app["status"] == "draft":
+            apps_db.update_application_status(app["app_id"], "submitted")
+            count += 1
+    return {"auto_submitted": count}
+
+
 @router.get("/{app_id}")
 def get_application(app_id: str, current_user: dict = Depends(get_current_user)):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    # Applicants can only see their own
     if (
         current_user["role"] == UserRole.applicant
         and app["owner_email"] != current_user["email"]
@@ -78,6 +99,9 @@ def save_application_data(
         raise HTTPException(
             status_code=400, detail="Cannot edit a submitted application"
         )
+    window = windows_db.get_window(app["window_id"])
+    if window and date_type.today().isoformat() > window["end_date"]:
+        raise HTTPException(status_code=400, detail="Application window has closed")
     apps_db.update_application_data(app_id, body.data)
     return {"message": "Saved"}
 

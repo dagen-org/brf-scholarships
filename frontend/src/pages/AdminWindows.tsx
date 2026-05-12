@@ -2,6 +2,7 @@ import { useEffect, useState, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import Footer from '../components/Footer'
 
 interface WindowItem {
   window_id: string
@@ -268,7 +269,11 @@ export default function AdminWindows() {
                   const isConfirmingDelete = confirmDeleteId === w.window_id
                   return (
                     <tr key={w.window_id} className={formMode === w.window_id ? 'bg-blue-50' : 'hover:bg-gray-50'}>
-                      <td className="px-4 py-3 font-medium text-gray-800">{w.name}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800">
+                        <Link to={`/admin/windows/${w.window_id}`} className="hover:text-blue-600 hover:underline">
+                          {w.name}
+                        </Link>
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${TYPE_STYLES[w.window_type]}`}>
                           {w.window_type}
@@ -301,6 +306,12 @@ export default function AdminWindows() {
                           </span>
                         ) : (
                           <span className="flex items-center justify-end gap-3">
+                            <Link
+                              to={`/admin/windows/${w.window_id}`}
+                              className="text-xs text-gray-600 hover:underline"
+                            >
+                              Applications
+                            </Link>
                             <button
                               onClick={() => openEdit(w)}
                               className="text-xs text-blue-600 hover:underline"
@@ -324,6 +335,7 @@ export default function AdminWindows() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

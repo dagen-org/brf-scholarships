@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import Footer from '../components/Footer'
 
 export default function AdminDashboard() {
   const { email, logout } = useAuth()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
         <h1 className="text-lg font-bold text-blue-800">Beaverton Rotary Scholarships — Admin</h1>
         <div className="flex items-center gap-4 text-sm">
@@ -14,13 +15,13 @@ export default function AdminDashboard() {
           <button onClick={logout} className="text-red-500 hover:underline">Sign out</button>
         </div>
       </nav>
-      <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <DashCard title="Application Windows" description="Create and manage scholarship windows." to="/admin/windows" />
+          <DashCard title="Application Windows" description="Create and manage scholarship windows and view submitted applications." to="/admin/windows" />
           <DashCard title="Reviewers" description="Invite or manage reviewer accounts." to="/admin/reviewers" />
-          <DashCard title="Applications" description="Browse all submitted applications." to="#" />
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

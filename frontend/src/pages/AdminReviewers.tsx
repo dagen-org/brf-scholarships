@@ -2,6 +2,7 @@ import { useEffect, useState, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import Footer from '../components/Footer'
 
 interface Reviewer {
   email: string
@@ -137,7 +138,7 @@ export default function AdminReviewers() {
   const isEditing = formMode !== null && formMode !== 'invite'
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
         <h1 className="text-lg font-bold text-blue-800">Beaverton Rotary Scholarships — Admin</h1>
         <div className="flex items-center gap-4 text-sm">
@@ -147,7 +148,7 @@ export default function AdminReviewers() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/admin" className="text-sm text-blue-600 hover:underline">← Dashboard</Link>
@@ -345,6 +346,7 @@ export default function AdminReviewers() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

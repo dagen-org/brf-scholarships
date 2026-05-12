@@ -9,7 +9,9 @@ import AcceptInvite from './pages/AcceptInvite'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminWindows from './pages/AdminWindows'
 import AdminReviewers from './pages/AdminReviewers'
+import AdminWindowApplications from './pages/AdminWindowApplications'
 import ApplicantDashboard from './pages/ApplicantDashboard'
+import ApplicationForm from './pages/ApplicationForm'
 import ReviewerDashboard from './pages/ReviewerDashboard'
 import Bootstrap from './pages/Bootstrap'
 
@@ -28,15 +30,18 @@ export default function App() {
           <Route element={<PrivateRoute roles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/windows" element={<AdminWindows />} />
+            <Route path="/admin/windows/:window_id" element={<AdminWindowApplications />} />
             <Route path="/admin/reviewers" element={<AdminReviewers />} />
           </Route>
 
           <Route element={<PrivateRoute roles={['applicant']} />}>
             <Route path="/apply" element={<ApplicantDashboard />} />
+            <Route path="/apply/:app_id" element={<ApplicationForm />} />
           </Route>
 
           <Route element={<PrivateRoute roles={['reviewer', 'admin']} />}>
             <Route path="/review" element={<ReviewerDashboard />} />
+            <Route path="/admin/applications/:app_id" element={<ApplicationForm />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

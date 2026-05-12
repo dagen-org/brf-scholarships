@@ -1,10 +1,11 @@
 import PublicNav from '../components/PublicNav'
+import Footer from '../components/Footer'
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <PublicNav />
-      <main className="max-w-3xl mx-auto px-6 py-12 space-y-8">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-blue-800 mb-3">About the Program</h1>
           <p className="text-gray-700 leading-relaxed">
@@ -64,6 +65,7 @@ export default function About() {
           </p>
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

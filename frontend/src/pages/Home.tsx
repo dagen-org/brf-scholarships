@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
 import PublicNav from '../components/PublicNav'
+import Footer from '../components/Footer'
 
 interface WindowItem {
   window_id: string
@@ -45,7 +46,7 @@ export default function Home() {
   const upcomingWindows = windows.filter(w => w.start_date > t && w.start_date <= soon)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <PublicNav />
 
       {/* Hero */}
@@ -146,6 +147,7 @@ export default function Home() {
           </div>
         )}
       </section>
+      <Footer />
     </div>
   )
 }
