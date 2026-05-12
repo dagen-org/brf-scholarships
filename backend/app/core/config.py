@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     # Security
     secret_key: str = "dev-secret-change-in-production"
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 240
 
     # DynamoDB
     aws_region: str = "us-west-2"
