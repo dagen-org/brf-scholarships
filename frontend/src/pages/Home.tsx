@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import api from '../api/client'
 import PublicNav from '../components/PublicNav'
 import Footer from '../components/Footer'
+import ceypImg from '../images/ceyp-1.jpg'
 
 // ─── Hero carousel slides ────────────────────────────────────────────────────
 
@@ -21,6 +22,7 @@ const SLIDES = [
     tag: 'CEYP',
     title: 'CEYP Scholarships',
     body: 'Continuing Education for Young Parents supports young women who had a child prior to graduating high school, helping them pursue a career-focused education and a better future for their families.',
+    image: ceypImg,
   },
   {
     tag: 'Vocational',
@@ -74,10 +76,16 @@ function HeroCarousel() {
   const slide = SLIDES[current]
 
   return (
-    <section className="bg-blue-800 text-white py-16 px-6 text-center relative select-none">
+    <section
+      className="bg-blue-800 text-white py-16 px-6 text-center relative select-none overflow-hidden"
+      style={slide.image ? { backgroundImage: `url(${slide.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+    >
+      {/* Dark overlay for slides with a background image */}
+      {slide.image && <div className="absolute inset-0 bg-blue-900/70" />}
+
       {/* Slide content */}
       <div
-        className="max-w-2xl mx-auto transition-opacity duration-300"
+        className="relative z-10 max-w-2xl mx-auto transition-opacity duration-300"
         style={{ opacity: visible ? 1 : 0 }}
       >
         {slide.tag && (
@@ -107,20 +115,20 @@ function HeroCarousel() {
       <button
         onClick={prev}
         aria-label="Previous slide"
-        className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-3xl leading-none px-2"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white/60 hover:text-white text-3xl leading-none px-2"
       >
         ‹
       </button>
       <button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-3xl leading-none px-2"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white/60 hover:text-white text-3xl leading-none px-2"
       >
         ›
       </button>
 
       {/* Dot indicators */}
-      <div className="flex justify-center gap-2 mt-8">
+      <div className="relative z-10 flex justify-center gap-2 mt-8">
         {SLIDES.map((_, i) => (
           <button
             key={i}
