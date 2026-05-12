@@ -4,6 +4,9 @@ import api from '../api/client'
 import PublicNav from '../components/PublicNav'
 import Footer from '../components/Footer'
 import ceypImg from '../images/ceyp-1.jpg'
+import gradImg from '../images/graduation-1.jpg'
+import vocationImg from '../images/vocational.png'
+
 
 // ─── Hero carousel slides ────────────────────────────────────────────────────
 
@@ -17,6 +20,7 @@ const SLIDES = [
     tag: 'Academic',
     title: 'Academic Scholarships',
     body: 'Awarded to graduating high school seniors attending a college or university in Oregon. Recipients may receive up to $6,000 per year, renewable annually for up to four years of study.',
+    image: gradImg,
   },
   {
     tag: 'CEYP',
@@ -28,6 +32,7 @@ const SLIDES = [
     tag: 'Vocational',
     title: 'Vocational Scholarships',
     body: 'For students pursuing trade schools, beauty schools, or other vocational programs. BRF supports career-ready students who choose skilled trades and technical education.',
+    image: vocationImg,
   },
 ]
 
@@ -95,20 +100,22 @@ function HeroCarousel() {
         )}
         <h1 className="text-4xl font-bold mb-4">{slide.title}</h1>
         <p className="text-blue-100 text-lg">{slide.body}</p>
-        <div className="mt-8 flex justify-center gap-4">
-          <Link
-            to="/about"
-            className="bg-white text-blue-800 font-medium px-6 py-2.5 rounded-lg hover:bg-blue-50"
-          >
-            Learn More
-          </Link>
-          <Link
-            to="/login?tab=register"
-            className="border border-white text-white font-medium px-6 py-2.5 rounded-lg hover:bg-blue-700"
-          >
-            Create Account
-          </Link>
-        </div>
+        {!slide.tag && (
+          <div className="mt-8 flex justify-center gap-4">
+            <Link
+              to="/about"
+              className="bg-white text-blue-800 font-medium px-6 py-2.5 rounded-lg hover:bg-blue-50"
+            >
+              Learn More
+            </Link>
+            <Link
+              to="/login?tab=register"
+              className="border border-white text-white font-medium px-6 py-2.5 rounded-lg hover:bg-blue-700"
+            >
+              Create Account
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Prev / Next arrows */}
