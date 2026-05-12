@@ -33,7 +33,9 @@ def create_application(
         )
 
     existing = apps_db.get_applications_by_user(current_user["email"])
-    if not is_test_window and any(a["status"] in ("draft", "submitted") for a in existing):
+    if not is_test_window and any(
+        a["status"] in ("draft", "submitted") for a in existing
+    ):
         raise HTTPException(
             status_code=409, detail="You already have an active application"
         )

@@ -73,7 +73,9 @@ def invite_reviewer(body: InviteReviewerRequest):
         send_reviewer_invite_email(body.email, token)
     except Exception as exc:
         users_db.delete_user(body.email)
-        raise HTTPException(status_code=502, detail=f"Failed to send invitation email: {exc}")
+        raise HTTPException(
+            status_code=502, detail=f"Failed to send invitation email: {exc}"
+        )
     return {"message": "Invitation sent"}
 
 
