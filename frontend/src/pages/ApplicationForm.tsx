@@ -9,6 +9,7 @@ import Footer from '../components/Footer'
 interface AppWindow {
   window_id: string
   name: string
+  window_type: 'testing' | 'live'
   start_date: string
   end_date: string
   writing_prompt?: string
@@ -647,7 +648,11 @@ export default function ApplicationForm() {
   const windowOpen = window_ && window_.start_date <= t && t <= window_.end_date
   const isApplicant = role === 'applicant'
   const isReviewerOrAdmin = role === 'admin' || role === 'reviewer'
-  const isEditable = isApplicant && app?.status === 'draft' && !!windowOpen
+  const isTestWindow = window_?.window_type === 'testing'
+  const isOwner = app?.owner_email === email
+  const isEditable =
+    (isApplicant && app?.status === 'draft' && !!windowOpen) ||
+    (isReviewerOrAdmin && isTestWindow && isOwner && app?.status === 'draft')
 
   const backPath = isReviewerOrAdmin
     ? `/admin/windows/${app?.window_id}`
@@ -700,7 +705,7 @@ export default function ApplicationForm() {
     try {
       await doSave(data)
       await api.post(`/applications/${app_id}/submit`)
-      navigate('/apply')
+      navigate(backPath)
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
       setSubmitError(msg || 'Submission failed. Please try again.')
@@ -818,8 +823,8 @@ export default function ApplicationForm() {
             </div>
           )}
 
-          {/* Comments (reviewer / admin) */}
-          {isReviewerOrAdmin && <CommentsSection appId={app_id!} />}
+          {/* Comments (reviewer / admin) — not shown on own test applications */}
+          {isReviewerOrAdmin && !isOwner && <CommentsSection appId={app_id!} />}
 
         </div>
       </div>

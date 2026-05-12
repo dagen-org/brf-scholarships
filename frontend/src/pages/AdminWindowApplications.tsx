@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from '../components/Footer'
@@ -55,13 +55,23 @@ const SCHOLARSHIP_LABELS: Record<string, string> = {
   vocational:       'Vocational',
 }
 
+const SCHOLARSHIP_TYPES = [
+  { type: 'academic',         label: 'Academic' },
+  { type: 'academic_renewal', label: 'Academic Renewal' },
+  { type: 'ceyp',             label: 'CEYP' },
+  { type: 'vocational',       label: 'Vocational' },
+]
+
 export default function AdminWindowApplications() {
   const { window_id } = useParams<{ window_id: string }>()
   const { email, logout } = useAuth()
+  const navigate = useNavigate()
   const [window_, setWindow_] = useState<WindowItem | null>(null)
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [starting, setStarting] = useState<string | null>(null)
+  const [startError, setStartError] = useState('')
 
   useEffect(() => {
     if (!window_id) return
@@ -76,6 +86,23 @@ export default function AdminWindowApplications() {
       .catch(() => setError('Failed to load data.'))
       .finally(() => setLoading(false))
   }, [window_id])
+
+  async function startTestApplication(scholarshipType: string) {
+    if (!window_id) return
+    setStarting(scholarshipType)
+    setStartError('')
+    try {
+      const res = await api.post('/applications/', {
+        window_id,
+        scholarship_type: scholarshipType,
+      })
+      navigate(`/admin/applications/${res.data.app_id}`)
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setStartError(msg || 'Failed to start test application.')
+      setStarting(null)
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -127,6 +154,31 @@ export default function AdminWindowApplications() {
             </div>
           )
         })()}
+
+        {/* Test application panel — only for testing windows */}
+        {!loading && window_?.window_type === 'testing' && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-5 space-y-3">
+            <div>
+              <p className="font-medium text-purple-900 text-sm">Start a Test Application</p>
+              <p className="text-xs text-purple-700 mt-0.5">
+                Testing windows allow admins and reviewers to submit test applications.
+              </p>
+            </div>
+            {startError && <p className="text-xs text-red-600">{startError}</p>}
+            <div className="flex flex-wrap gap-2">
+              {SCHOLARSHIP_TYPES.map(({ type, label }) => (
+                <button
+                  key={type}
+                  onClick={() => startTestApplication(type)}
+                  disabled={!!starting}
+                  className="text-sm bg-white border border-purple-300 text-purple-800 px-3 py-1.5 rounded-lg hover:bg-purple-100 disabled:opacity-50"
+                >
+                  {starting === type ? 'Starting…' : label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-xl shadow overflow-hidden">
           {loading ? (

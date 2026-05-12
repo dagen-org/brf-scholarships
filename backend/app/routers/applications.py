@@ -19,9 +19,16 @@ router = APIRouter()
 def create_application(
     body: ApplicationCreate, current_user: dict = Depends(get_current_user)
 ):
-    if current_user["role"] != UserRole.applicant:
+    window = windows_db.get_window(body.window_id)
+    if not window:
+        raise HTTPException(status_code=404, detail="Application window not found")
+
+    is_applicant = current_user["role"] == UserRole.applicant
+    is_test_window = window.get("window_type") == "testing"
+
+    if not is_applicant and not is_test_window:
         raise HTTPException(
-            status_code=403, detail="Only applicants can create applications"
+            status_code=403, detail="Only applicants can create applications in live windows"
         )
 
     existing = apps_db.get_applications_by_user(current_user["email"])
@@ -29,10 +36,6 @@ def create_application(
         raise HTTPException(
             status_code=409, detail="You already have an active application"
         )
-
-    window = windows_db.get_window(body.window_id)
-    if not window:
-        raise HTTPException(status_code=404, detail="Application window not found")
 
     app = apps_db.create_application(
         current_user["email"], body.window_id, body.scholarship_type
@@ -100,7 +103,7 @@ def save_application_data(
             status_code=400, detail="Cannot edit a submitted application"
         )
     window = windows_db.get_window(app["window_id"])
-    if window and date_type.today().isoformat() > window["end_date"]:
+    if window and window.get("window_type") != "testing" and date_type.today().isoformat() > window["end_date"]:
         raise HTTPException(status_code=400, detail="Application window has closed")
     apps_db.update_application_data(app_id, body.data)
     return {"message": "Saved"}
