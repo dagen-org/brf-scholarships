@@ -685,6 +685,8 @@ export default function ApplicationForm() {
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved')
   const [submitConfirm, setSubmitConfirm] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const saveTimer = useRef<ReturnType<typeof setTimeout>>()
 
@@ -768,6 +770,17 @@ export default function ApplicationForm() {
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
       setSubmitError(msg || 'Submission failed. Please try again.')
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    try {
+      await api.delete(`/applications/${app_id}`)
+      navigate(backPath)
+    } catch {
+      setDeleting(false)
+      setDeleteConfirm(false)
     }
   }
 
@@ -865,7 +878,7 @@ export default function ApplicationForm() {
           {type === 'vocational' && <FilesVocationalSection {...sectionProps} />}
           {(type === 'academic' || type === 'ceyp') && <AdditionalSection {...sectionProps} />}
 
-          {/* Save / Submit bar */}
+          {/* Save / Submit / Delete bar */}
           {isEditable && (
             <div className="bg-white rounded-xl shadow px-5 py-4 flex flex-wrap items-center gap-3">
               <button
@@ -882,6 +895,26 @@ export default function ApplicationForm() {
                 Submit Application
               </button>
               {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+              <div className="ml-auto">
+                <button
+                  onClick={() => setDeleteConfirm(true)}
+                  className="text-sm text-red-500 hover:text-red-700 hover:underline"
+                >
+                  Delete Application
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Delete button for read-only owner view (submitted / closed window) */}
+          {!isEditable && isOwner && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => setDeleteConfirm(true)}
+                className="text-sm text-red-500 hover:text-red-700 hover:underline"
+              >
+                Delete Application
+              </button>
             </div>
           )}
 
@@ -908,6 +941,30 @@ export default function ApplicationForm() {
                 className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
                 Yes, Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 space-y-4">
+            <h3 className="font-semibold text-gray-800">Delete Application?</h3>
+            <p className="text-sm text-gray-600">
+              This will permanently delete the application and all entered data. This cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setDeleteConfirm(false)} disabled={deleting} className="text-sm px-4 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50">
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? 'Deleting…' : 'Yes, Delete'}
               </button>
             </div>
           </div>

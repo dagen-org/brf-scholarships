@@ -116,6 +116,16 @@ def save_application_data(
     return {"message": "Saved"}
 
 
+@router.delete("/{app_id}", status_code=204)
+def delete_application(app_id: str, current_user: dict = Depends(get_current_user)):
+    app = apps_db.get_application(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+    if app["owner_email"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    apps_db.delete_application(app_id)
+
+
 @router.post("/{app_id}/submit")
 def submit_application(app_id: str, current_user: dict = Depends(get_current_user)):
     app = apps_db.get_application(app_id)

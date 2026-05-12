@@ -66,6 +66,10 @@ def update_application_data(app_id: str, data: dict) -> None:
     )
 
 
+def delete_application(app_id: str) -> None:
+    get_table().delete_item(Key=_pk(app_id))
+
+
 def update_application_status(app_id: str, status: str) -> None:
     get_table().update_item(
         Key=_pk(app_id),

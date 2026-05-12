@@ -78,6 +78,8 @@ export default function AdminWindowApplications() {
   const [error, setError] = useState('')
   const [starting, setStarting] = useState<string | null>(null)
   const [startError, setStartError] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (!window_id) return
@@ -92,6 +94,17 @@ export default function AdminWindowApplications() {
       .catch(() => setError('Failed to load data.'))
       .finally(() => setLoading(false))
   }, [window_id])
+
+  async function handleDelete(app_id: string) {
+    setDeleting(true)
+    try {
+      await api.delete(`/applications/${app_id}`)
+      setApplications(prev => prev.filter(a => a.app_id !== app_id))
+    } finally {
+      setDeleting(false)
+      setConfirmDeleteId(null)
+    }
+  }
 
   async function startTestApplication(scholarshipType: string) {
     if (!window_id) return
@@ -222,13 +235,42 @@ export default function AdminWindowApplications() {
                     <td className="px-4 py-3 text-gray-500">
                       {new Date(app.updated_at).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link
-                        to={`/admin/applications/${app.app_id}`}
-                        className="text-xs text-blue-600 hover:underline"
-                      >
-                        View
-                      </Link>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      {confirmDeleteId === app.app_id ? (
+                        <span className="flex items-center justify-end gap-2">
+                          <span className="text-xs text-gray-500">Delete?</span>
+                          <button
+                            onClick={() => handleDelete(app.app_id)}
+                            disabled={deleting}
+                            className="text-xs text-red-600 font-medium hover:underline disabled:opacity-50"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="text-xs text-gray-500 hover:underline"
+                          >
+                            Cancel
+                          </button>
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-end gap-3">
+                          <Link
+                            to={`/admin/applications/${app.app_id}`}
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            View
+                          </Link>
+                          {app.owner_email === email && (
+                            <button
+                              onClick={() => setConfirmDeleteId(app.app_id)}
+                              className="text-xs text-red-500 hover:underline"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
