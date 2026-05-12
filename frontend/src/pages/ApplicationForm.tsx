@@ -106,12 +106,56 @@ function Field({ label, optional, children }: FieldProps) {
 }
 
 const inputCls = 'w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+const inputErrCls = 'w-full border border-red-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400'
 const readCls  = 'text-sm text-gray-800 py-1 min-h-[1.5rem]'
+
+function formatPhone(raw: string): string {
+  const d = raw.replace(/\D/g, '').slice(0, 10)
+  if (d.length <= 3) return d.length ? `(${d}` : ''
+  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`
+}
 
 interface TFProps { value: string; onChange?: (v: string) => void; readOnly: boolean; placeholder?: string }
 function TF({ value, onChange, readOnly, placeholder }: TFProps) {
   if (readOnly) return <p className={readCls}>{value || '—'}</p>
   return <input type="text" value={value} onChange={e => onChange?.(e.target.value)} placeholder={placeholder} className={inputCls} />
+}
+
+interface PhoneFieldProps { value: string; onChange?: (v: string) => void; readOnly: boolean }
+function PhoneField({ value, onChange, readOnly }: PhoneFieldProps) {
+  const invalid = !!value && !/^\(\d{3}\) \d{3}-\d{4}$/.test(value)
+  if (readOnly) return <p className={readCls}>{value || '—'}</p>
+  return (
+    <div>
+      <input
+        type="tel"
+        value={value}
+        onChange={e => onChange?.(formatPhone(e.target.value))}
+        placeholder="(503) 555-1234"
+        className={invalid ? inputErrCls : inputCls}
+      />
+      {invalid && <p className="text-xs text-red-500 mt-0.5">Enter a 10-digit phone number</p>}
+    </div>
+  )
+}
+
+interface EmailFieldProps { value: string; onChange?: (v: string) => void; readOnly: boolean }
+function EmailField({ value, onChange, readOnly }: EmailFieldProps) {
+  const invalid = !!value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  if (readOnly) return <p className={readCls}>{value || '—'}</p>
+  return (
+    <div>
+      <input
+        type="email"
+        value={value}
+        onChange={e => onChange?.(e.target.value)}
+        placeholder="name@example.com"
+        className={invalid ? inputErrCls : inputCls}
+      />
+      {invalid && <p className="text-xs text-red-500 mt-0.5">Enter a valid email address</p>}
+    </div>
+  )
 }
 
 interface TAProps { value: string; onChange?: (v: string) => void; readOnly: boolean; rows?: number; placeholder?: string }
@@ -267,12 +311,17 @@ function PersonalSection({ data, set, readOnly, type }: SectionFormProps & { typ
         <Field label="Middle Name" optional><TF value={s('middle_name')} onChange={v => set('middle_name', v)} readOnly={readOnly} /></Field>
         <Field label="Last Name"><TF value={s('last_name')} onChange={v => set('last_name', v)} readOnly={readOnly} /></Field>
       </div>
-      <Field label="Home Address">
-        <TA value={s('address')} onChange={v => set('address', v)} readOnly={readOnly} rows={2} placeholder="Street, City, State, ZIP" />
+      <Field label="Street Address">
+        <TF value={s('address')} onChange={v => set('address', v)} readOnly={readOnly} placeholder="123 Main St" />
       </Field>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Field label="City"><TF value={s('city')} onChange={v => set('city', v)} readOnly={readOnly} /></Field>
+        <Field label="State"><TF value={s('state')} onChange={v => set('state', v)} readOnly={readOnly} placeholder="OR" /></Field>
+        <Field label="ZIP Code"><TF value={s('zip')} onChange={v => set('zip', v)} readOnly={readOnly} placeholder="97007" /></Field>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Email Address"><TF value={s('email')} onChange={v => set('email', v)} readOnly={readOnly} /></Field>
-        <Field label="Phone Number"><TF value={s('phone')} onChange={v => set('phone', v)} readOnly={readOnly} /></Field>
+        <Field label="Email Address"><EmailField value={s('email')} onChange={v => set('email', v)} readOnly={readOnly} /></Field>
+        <Field label="Phone Number"><PhoneField value={s('phone')} onChange={v => set('phone', v)} readOnly={readOnly} /></Field>
       </div>
       <Field label="Parent(s) or Legal Guardian(s)">
         <TA value={s('guardians')} onChange={v => set('guardians', v)} readOnly={readOnly} rows={2} placeholder="Name(s) and relationship" />
@@ -331,7 +380,7 @@ function EducationAcademicSection({ data, set, readOnly }: SectionFormProps) {
         <Field label="ACT Score" optional><TF value={s('act_score')} onChange={v => set('act_score', v)} readOnly={readOnly} /></Field>
         <Field label="SAT Score" optional><TF value={s('sat_score')} onChange={v => set('sat_score', v)} readOnly={readOnly} /></Field>
         <Field label="Advisor / Counselor"><TF value={s('advisor')} onChange={v => set('advisor', v)} readOnly={readOnly} /></Field>
-        <Field label="Advisor Phone Number"><TF value={s('advisor_phone')} onChange={v => set('advisor_phone', v)} readOnly={readOnly} /></Field>
+        <Field label="Advisor Phone Number"><PhoneField value={s('advisor_phone')} onChange={v => set('advisor_phone', v)} readOnly={readOnly} /></Field>
         <Field label="Intended College or University"><TF value={s('intended_college')} onChange={v => set('intended_college', v)} readOnly={readOnly} /></Field>
         <Field label="Field of Study"><TF value={s('field_of_study')} onChange={v => set('field_of_study', v)} readOnly={readOnly} /></Field>
         <Field label="Academic Honors" optional><TF value={s('academic_honors')} onChange={v => set('academic_honors', v)} readOnly={readOnly} /></Field>
@@ -378,7 +427,7 @@ function EducationVocationalSection({ data, set, readOnly }: SectionFormProps) {
         <Field label="ACT Score" optional><TF value={s('act_score')} onChange={v => set('act_score', v)} readOnly={readOnly} /></Field>
         <Field label="SAT Score" optional><TF value={s('sat_score')} onChange={v => set('sat_score', v)} readOnly={readOnly} /></Field>
         <Field label="Advisor / Counselor"><TF value={s('advisor')} onChange={v => set('advisor', v)} readOnly={readOnly} /></Field>
-        <Field label="Advisor Phone Number"><TF value={s('advisor_phone')} onChange={v => set('advisor_phone', v)} readOnly={readOnly} /></Field>
+        <Field label="Advisor Phone Number"><PhoneField value={s('advisor_phone')} onChange={v => set('advisor_phone', v)} readOnly={readOnly} /></Field>
         <Field label="Post-Secondary School to Attend"><TF value={s('post_secondary_school')} onChange={v => set('post_secondary_school', v)} readOnly={readOnly} /></Field>
         <Field label="Field of Study"><TF value={s('field_of_study')} onChange={v => set('field_of_study', v)} readOnly={readOnly} /></Field>
       </div>
@@ -395,7 +444,12 @@ function FinanceAcademicSection({ data, set, readOnly }: SectionFormProps) {
   const totalResources = num(data.fin_family) + num(data.fin_loans) + num(data.fin_other_scholarships) + num(data.fin_other_resources)
   return (
     <Section id="finance" title="Finance Information">
-      <Field label="Intended College or Institution"><TF value={s('fin_institution')} onChange={v => set('fin_institution', v)} readOnly={readOnly} /></Field>
+      <Field label="Intended College or Institution">
+        <TF value={s('intended_college')} readOnly={true} />
+        {!readOnly && !s('intended_college') && (
+          <p className="text-xs text-gray-400 mt-0.5">Set in the Education section above</p>
+        )}
+      </Field>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Tuition and Fees"><Curr value={s('fin_tuition')} onChange={v => set('fin_tuition', v)} readOnly={readOnly} /></Field>
         <Field label="Books and Supplies"><Curr value={s('fin_books')} onChange={v => set('fin_books', v)} readOnly={readOnly} /></Field>
@@ -419,7 +473,12 @@ function FinanceRenewalSection({ data, set, readOnly }: SectionFormProps) {
   const totalResources = num(data.fin_family) + num(data.fin_loans) + num(data.fin_other_scholarships) + num(data.fin_other_resources)
   return (
     <Section id="finance" title="Finance Information">
-      <Field label="Current Institution"><TF value={s('fin_institution')} onChange={v => set('fin_institution', v)} readOnly={readOnly} /></Field>
+      <Field label="Current Institution">
+        <TF value={s('current_college')} readOnly={true} />
+        {!readOnly && !s('current_college') && (
+          <p className="text-xs text-gray-400 mt-0.5">Set in the Education section above</p>
+        )}
+      </Field>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Tuition and Fees"><Curr value={s('fin_tuition')} onChange={v => set('fin_tuition', v)} readOnly={readOnly} /></Field>
         <Field label="Books and Supplies"><Curr value={s('fin_books')} onChange={v => set('fin_books', v)} readOnly={readOnly} /></Field>
