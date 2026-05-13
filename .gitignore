@@ -45,3 +45,6 @@ infra/terraform/*.tfplan
 
 #Secrets
 secrets/aws.json
+
+#Claude
+CLAUDE.md

@@ -40,3 +40,6 @@ Mail is captured by MailHog at `http://localhost:8025`.
 - File uploads go directly from the browser to S3 via presigned URLs; the backend only stores `{file_id, filename}` references in the application `data` blob.
 - Testing-type application windows allow admins and reviewers to create multiple test applications with no single-active restriction.
 - SES is used for email in production (`USE_SES=true`); MailHog (SMTP on port 1025) is used locally.
+
+## Git Commit
+- Do not add the string: "Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>" to git commits.
