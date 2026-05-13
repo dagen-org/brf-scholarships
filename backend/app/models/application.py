@@ -45,7 +45,7 @@ class NoteCategory(str, Enum):
 
 class CommentCreate(BaseModel):
     content: str
-    category: Literal['comment', 'question'] = 'comment'
+    category: Literal["comment", "question"] = "comment"
 
 
 class CommentUpdate(BaseModel):

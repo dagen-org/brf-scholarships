@@ -122,7 +122,9 @@ def get_files(app_id: str) -> list[dict]:
     return resp.get("Items", [])
 
 
-def add_comment(app_id: str, author_email: str, content: str, category: str = "comment") -> dict:
+def add_comment(
+    app_id: str, author_email: str, content: str, category: str = "comment"
+) -> dict:
     comment_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     item = {

@@ -161,7 +161,9 @@ def add_comment(
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    return apps_db.add_comment(app_id, current_user["email"], body.content, body.category)
+    return apps_db.add_comment(
+        app_id, current_user["email"], body.content, body.category
+    )
 
 
 @router.put(
@@ -197,5 +199,7 @@ def delete_comment(
     if not comment:
         raise HTTPException(status_code=404, detail="Note not found")
     if comment["author_email"] != current_user["email"]:
-        raise HTTPException(status_code=403, detail="You can only delete your own notes")
+        raise HTTPException(
+            status_code=403, detail="You can only delete your own notes"
+        )
     apps_db.delete_comment(app_id, comment_id)
