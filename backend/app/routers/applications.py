@@ -9,6 +9,7 @@ from app.models.application import (
     ApplicationCreate,
     ApplicationDataUpdate,
     CommentCreate,
+    CommentUpdate,
 )
 from app.models.user import UserRole
 
@@ -161,3 +162,40 @@ def add_comment(
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
     return apps_db.add_comment(app_id, current_user["email"], body.content, body.category)
+
+
+@router.put(
+    "/{app_id}/comments/{comment_id}",
+    dependencies=[Depends(require_reviewer_or_admin)],
+)
+def update_comment(
+    app_id: str,
+    comment_id: str,
+    body: CommentUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    comment = apps_db.get_comment(app_id, comment_id)
+    if not comment:
+        raise HTTPException(status_code=404, detail="Note not found")
+    if comment["author_email"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="You can only edit your own notes")
+    apps_db.update_comment(app_id, comment_id, body.content)
+    return {**comment, "content": body.content}
+
+
+@router.delete(
+    "/{app_id}/comments/{comment_id}",
+    dependencies=[Depends(require_reviewer_or_admin)],
+    status_code=204,
+)
+def delete_comment(
+    app_id: str,
+    comment_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    comment = apps_db.get_comment(app_id, comment_id)
+    if not comment:
+        raise HTTPException(status_code=404, detail="Note not found")
+    if comment["author_email"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="You can only delete your own notes")
+    apps_db.delete_comment(app_id, comment_id)

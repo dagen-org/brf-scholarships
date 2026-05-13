@@ -48,8 +48,13 @@ class CommentCreate(BaseModel):
     category: Literal['comment', 'question'] = 'comment'
 
 
+class CommentUpdate(BaseModel):
+    content: str
+
+
 class CommentPublic(BaseModel):
     app_id: str
+    comment_id: str
     author_email: str
     content: str
     category: NoteCategory

@@ -123,11 +123,13 @@ def get_files(app_id: str) -> list[dict]:
 
 
 def add_comment(app_id: str, author_email: str, content: str, category: str = "comment") -> dict:
+    comment_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     item = {
         "PK": f"APPLICATION#{app_id}",
-        "SK": f"COMMENT#{now}#{author_email}",
+        "SK": f"COMMENT#{comment_id}",
         "app_id": app_id,
+        "comment_id": comment_id,
         "author_email": author_email,
         "content": content,
         "category": category,
@@ -135,3 +137,24 @@ def add_comment(app_id: str, author_email: str, content: str, category: str = "c
     }
     get_table().put_item(Item=item)
     return item
+
+
+def get_comment(app_id: str, comment_id: str) -> Optional[dict]:
+    resp = get_table().get_item(
+        Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"}
+    )
+    return resp.get("Item")
+
+
+def update_comment(app_id: str, comment_id: str, content: str) -> None:
+    get_table().update_item(
+        Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"},
+        UpdateExpression="SET content = :content",
+        ExpressionAttributeValues={":content": content},
+    )
+
+
+def delete_comment(app_id: str, comment_id: str) -> None:
+    get_table().delete_item(
+        Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"}
+    )

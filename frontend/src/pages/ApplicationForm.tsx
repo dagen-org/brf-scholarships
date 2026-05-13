@@ -619,24 +619,123 @@ function AdditionalSection({ data, set, readOnly }: SectionFormProps) {
 // ─── Reviewer notes (reviewer/admin only) ────────────────────────────────────
 
 type NoteCategory = 'comment' | 'question'
-interface Note { app_id: string; author_email: string; content: string; category: NoteCategory; created_at: string }
+interface Note { app_id: string; comment_id: string; author_email: string; content: string; category: NoteCategory; created_at: string }
 
 const NOTE_CATEGORIES: { value: NoteCategory; label: string; color: string }[] = [
   { value: 'comment',  label: 'Comment',                 color: 'border-blue-300' },
   { value: 'question', label: 'Question for Applicant',  color: 'border-amber-400' },
 ]
 
-function NoteGroup({ label, color, notes }: { label: string; color: string; notes: Note[] }) {
+interface NoteItemProps {
+  appId: string
+  note: Note
+  color: string
+  currentEmail: string | null
+  onUpdated: (updated: Note) => void
+  onDeleted: (comment_id: string) => void
+}
+
+function NoteItem({ appId, note, color, currentEmail, onUpdated, onDeleted }: NoteItemProps) {
+  const isOwn = note.author_email === currentEmail
+  const [editing, setEditing] = useState(false)
+  const [editText, setEditText] = useState(note.content)
+  const [saving, setSaving] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [actionError, setActionError] = useState('')
+
+  async function saveEdit() {
+    if (!editText.trim() || editText.trim() === note.content) { setEditing(false); return }
+    setSaving(true)
+    setActionError('')
+    try {
+      const res = await api.put(`/applications/${appId}/comments/${note.comment_id}`, { content: editText.trim() })
+      onUpdated(res.data)
+      setEditing(false)
+    } catch {
+      setActionError('Failed to save. Please try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function doDelete() {
+    setDeleting(true)
+    setActionError('')
+    try {
+      await api.delete(`/applications/${appId}/comments/${note.comment_id}`)
+      onDeleted(note.comment_id)
+    } catch {
+      setActionError('Failed to delete. Please try again.')
+      setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  return (
+    <div className={`border-l-2 ${color} pl-3 space-y-1`}>
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="text-xs text-gray-400 flex-1">{note.author_email} · {new Date(note.created_at).toLocaleString()}</p>
+        {isOwn && !editing && !confirmDelete && (
+          <div className="flex gap-2">
+            <button type="button" onClick={() => { setEditText(note.content); setEditing(true); setActionError('') }} className="text-xs text-blue-500 hover:underline">Edit</button>
+            <button type="button" onClick={() => { setConfirmDelete(true); setActionError('') }} className="text-xs text-red-400 hover:underline">Delete</button>
+          </div>
+        )}
+      </div>
+
+      {editing ? (
+        <div className="space-y-1.5">
+          <textarea
+            value={editText}
+            onChange={e => setEditText(e.target.value)}
+            rows={3}
+            className={inputCls}
+            autoFocus
+          />
+          <div className="flex gap-2 items-center">
+            <button type="button" onClick={saveEdit} disabled={saving || !editText.trim()} className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50">
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button type="button" onClick={() => setEditing(false)} disabled={saving} className="text-xs text-gray-500 hover:underline">Cancel</button>
+            {actionError && <p className="text-xs text-red-500">{actionError}</p>}
+          </div>
+        </div>
+      ) : confirmDelete ? (
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-red-600">Delete this note?</p>
+          <button type="button" onClick={doDelete} disabled={deleting} className="text-xs text-red-600 font-medium hover:underline disabled:opacity-50">{deleting ? 'Deleting…' : 'Yes'}</button>
+          <button type="button" onClick={() => setConfirmDelete(false)} disabled={deleting} className="text-xs text-gray-500 hover:underline">Cancel</button>
+        </div>
+      ) : (
+        <>
+          <p className="text-sm text-gray-800 whitespace-pre-wrap">{note.content}</p>
+          {actionError && <p className="text-xs text-red-500">{actionError}</p>}
+        </>
+      )}
+    </div>
+  )
+}
+
+interface NoteGroupProps {
+  appId: string
+  label: string
+  color: string
+  notes: Note[]
+  currentEmail: string | null
+  onUpdated: (updated: Note) => void
+  onDeleted: (comment_id: string) => void
+}
+
+function NoteGroup({ appId, label, color, notes, currentEmail, onUpdated, onDeleted }: NoteGroupProps) {
   return (
     <div className="space-y-2">
       <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</h4>
       {notes.length === 0
         ? <p className="text-sm text-gray-400 italic">None yet.</p>
-        : notes.map((n, i) => (
-          <div key={i} className={`border-l-2 ${color} pl-3 space-y-0.5`}>
-            <p className="text-xs text-gray-400">{n.author_email} · {new Date(n.created_at).toLocaleString()}</p>
-            <p className="text-sm text-gray-800 whitespace-pre-wrap">{n.content}</p>
-          </div>
+        : notes.map(n => (
+          <NoteItem key={n.comment_id} appId={appId} note={n} color={color} currentEmail={currentEmail} onUpdated={onUpdated} onDeleted={onDeleted} />
         ))
       }
     </div>
@@ -644,6 +743,7 @@ function NoteGroup({ label, color, notes }: { label: string; color: string; note
 }
 
 function ReviewerNotesSection({ appId }: { appId: string }) {
+  const { email } = useAuth()
   const [notes, setNotes] = useState<Note[]>([])
   const [text, setText] = useState('')
   const [category, setCategory] = useState<NoteCategory>('comment')
@@ -666,6 +766,14 @@ function ReviewerNotesSection({ appId }: { appId: string }) {
     }
   }
 
+  function handleUpdated(updated: Note) {
+    setNotes(prev => prev.map(n => n.comment_id === updated.comment_id ? updated : n))
+  }
+
+  function handleDeleted(comment_id: string) {
+    setNotes(prev => prev.filter(n => n.comment_id !== comment_id))
+  }
+
   const comments  = notes.filter(n => n.category === 'comment')
   const questions = notes.filter(n => n.category === 'question')
 
@@ -673,8 +781,8 @@ function ReviewerNotesSection({ appId }: { appId: string }) {
     <div className="bg-white rounded-xl shadow p-6 space-y-6">
       <h3 className="text-base font-semibold text-gray-800 border-b pb-2">Reviewer Notes</h3>
 
-      <NoteGroup label="Comments" color="border-blue-300" notes={comments} />
-      <NoteGroup label="Questions for Applicant" color="border-amber-400" notes={questions} />
+      <NoteGroup appId={appId} label="Comments" color="border-blue-300" notes={comments} currentEmail={email} onUpdated={handleUpdated} onDeleted={handleDeleted} />
+      <NoteGroup appId={appId} label="Questions for Applicant" color="border-amber-400" notes={questions} currentEmail={email} onUpdated={handleUpdated} onDeleted={handleDeleted} />
 
       <form onSubmit={addNote} className="space-y-3 pt-2 border-t">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Add Note</p>
