@@ -954,8 +954,8 @@ export default function ApplicationForm() {
             </div>
           )}
 
-          {/* Reviewer notes — not shown on own test applications */}
-          {isReviewerOrAdmin && !isOwner && <ReviewerNotesSection appId={app_id!} />}
+          {/* Reviewer notes — shown to all reviewers; on test windows shown even to the owner */}
+          {isReviewerOrAdmin && (!isOwner || isTestWindow) && <ReviewerNotesSection appId={app_id!} />}
 
         </div>
       </div>
