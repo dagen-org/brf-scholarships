@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from typing import Any
+from typing import Any, Literal
 
 
 class ScholarshipType(str, Enum):
@@ -38,12 +38,19 @@ class ApplicationPublic(BaseModel):
     updated_at: str
 
 
+class NoteCategory(str, Enum):
+    comment = "comment"
+    question = "question"
+
+
 class CommentCreate(BaseModel):
     content: str
+    category: Literal['comment', 'question'] = 'comment'
 
 
 class CommentPublic(BaseModel):
     app_id: str
     author_email: str
     content: str
+    category: NoteCategory
     created_at: str

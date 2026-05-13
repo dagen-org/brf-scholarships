@@ -141,16 +141,11 @@ def submit_application(app_id: str, current_user: dict = Depends(get_current_use
     return {"message": "Application submitted"}
 
 
-@router.get("/{app_id}/comments")
-def get_comments(app_id: str, current_user: dict = Depends(get_current_user)):
+@router.get("/{app_id}/comments", dependencies=[Depends(require_reviewer_or_admin)])
+def get_comments(app_id: str):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    if (
-        current_user["role"] == UserRole.applicant
-        and app["owner_email"] != current_user["email"]
-    ):
-        raise HTTPException(status_code=403, detail="Access denied")
     return apps_db.get_comments(app_id)
 
 
@@ -165,4 +160,4 @@ def add_comment(
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    return apps_db.add_comment(app_id, current_user["email"], body.content)
+    return apps_db.add_comment(app_id, current_user["email"], body.content, body.category)

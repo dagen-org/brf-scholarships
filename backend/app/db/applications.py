@@ -122,7 +122,7 @@ def get_files(app_id: str) -> list[dict]:
     return resp.get("Items", [])
 
 
-def add_comment(app_id: str, author_email: str, content: str) -> dict:
+def add_comment(app_id: str, author_email: str, content: str, category: str = "comment") -> dict:
     now = datetime.now(timezone.utc).isoformat()
     item = {
         "PK": f"APPLICATION#{app_id}",
@@ -130,6 +130,7 @@ def add_comment(app_id: str, author_email: str, content: str) -> dict:
         "app_id": app_id,
         "author_email": author_email,
         "content": content,
+        "category": category,
         "created_at": now,
     }
     get_table().put_item(Item=item)

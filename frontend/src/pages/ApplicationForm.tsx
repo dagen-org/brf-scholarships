@@ -616,54 +616,90 @@ function AdditionalSection({ data, set, readOnly }: SectionFormProps) {
   )
 }
 
-// ─── Comments (reviewer/admin) ────────────────────────────────────────────────
+// ─── Reviewer notes (reviewer/admin only) ────────────────────────────────────
 
-interface Comment { app_id: string; author_email: string; content: string; created_at: string }
+type NoteCategory = 'comment' | 'question'
+interface Note { app_id: string; author_email: string; content: string; category: NoteCategory; created_at: string }
 
-function CommentsSection({ appId }: { appId: string }) {
-  const [comments, setComments] = useState<Comment[]>([])
+const NOTE_CATEGORIES: { value: NoteCategory; label: string; color: string }[] = [
+  { value: 'comment',  label: 'Comment',                 color: 'border-blue-300' },
+  { value: 'question', label: 'Question for Applicant',  color: 'border-amber-400' },
+]
+
+function NoteGroup({ label, color, notes }: { label: string; color: string; notes: Note[] }) {
+  return (
+    <div className="space-y-2">
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</h4>
+      {notes.length === 0
+        ? <p className="text-sm text-gray-400 italic">None yet.</p>
+        : notes.map((n, i) => (
+          <div key={i} className={`border-l-2 ${color} pl-3 space-y-0.5`}>
+            <p className="text-xs text-gray-400">{n.author_email} · {new Date(n.created_at).toLocaleString()}</p>
+            <p className="text-sm text-gray-800 whitespace-pre-wrap">{n.content}</p>
+          </div>
+        ))
+      }
+    </div>
+  )
+}
+
+function ReviewerNotesSection({ appId }: { appId: string }) {
+  const [notes, setNotes] = useState<Note[]>([])
   const [text, setText] = useState('')
+  const [category, setCategory] = useState<NoteCategory>('comment')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    api.get(`/applications/${appId}/comments`).then(r => setComments(r.data))
+    api.get(`/applications/${appId}/comments`).then(r => setNotes(r.data))
   }, [appId])
 
-  async function addComment(e: FormEvent) {
+  async function addNote(e: FormEvent) {
     e.preventDefault()
     if (!text.trim()) return
     setSaving(true)
     try {
-      const res = await api.post(`/applications/${appId}/comments`, { content: text.trim() })
-      setComments(prev => [...prev, res.data])
+      const res = await api.post(`/applications/${appId}/comments`, { content: text.trim(), category })
+      setNotes(prev => [...prev, res.data])
       setText('')
     } finally {
       setSaving(false)
     }
   }
 
+  const comments  = notes.filter(n => n.category === 'comment')
+  const questions = notes.filter(n => n.category === 'question')
+
   return (
-    <div className="bg-white rounded-xl shadow p-6 space-y-4">
-      <h3 className="text-base font-semibold text-gray-800 border-b pb-2">Reviewer Comments</h3>
-      {comments.length === 0
-        ? <p className="text-sm text-gray-400 italic">No comments yet.</p>
-        : comments.map((c, i) => (
-          <div key={i} className="border-l-2 border-blue-200 pl-3 space-y-0.5">
-            <p className="text-xs text-gray-400">{c.author_email} · {new Date(c.created_at).toLocaleString()}</p>
-            <p className="text-sm text-gray-800 whitespace-pre-wrap">{c.content}</p>
-          </div>
-        ))
-      }
-      <form onSubmit={addComment} className="space-y-2 pt-2">
+    <div className="bg-white rounded-xl shadow p-6 space-y-6">
+      <h3 className="text-base font-semibold text-gray-800 border-b pb-2">Reviewer Notes</h3>
+
+      <NoteGroup label="Comments" color="border-blue-300" notes={comments} />
+      <NoteGroup label="Questions for Applicant" color="border-amber-400" notes={questions} />
+
+      <form onSubmit={addNote} className="space-y-3 pt-2 border-t">
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Add Note</p>
+        <div className="flex gap-4">
+          {NOTE_CATEGORIES.map(cat => (
+            <label key={cat.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
+              <input
+                type="radio"
+                checked={category === cat.value}
+                onChange={() => setCategory(cat.value)}
+                className="accent-blue-600"
+              />
+              {cat.label}
+            </label>
+          ))}
+        </div>
         <textarea
           value={text}
           onChange={e => setText(e.target.value)}
           rows={3}
-          placeholder="Add a comment…"
+          placeholder={category === 'question' ? 'Enter a question to ask the applicant during the interview…' : 'Add a comment…'}
           className={inputCls}
         />
         <button type="submit" disabled={saving || !text.trim()} className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-          {saving ? 'Saving…' : 'Add Comment'}
+          {saving ? 'Saving…' : 'Add Note'}
         </button>
       </form>
     </div>
@@ -918,8 +954,8 @@ export default function ApplicationForm() {
             </div>
           )}
 
-          {/* Comments (reviewer / admin) — not shown on own test applications */}
-          {isReviewerOrAdmin && !isOwner && <CommentsSection appId={app_id!} />}
+          {/* Reviewer notes — not shown on own test applications */}
+          {isReviewerOrAdmin && !isOwner && <ReviewerNotesSection appId={app_id!} />}
 
         </div>
       </div>
