@@ -131,7 +131,9 @@ def delete_application(app_id: str, current_user: dict = Depends(get_current_use
         raise HTTPException(status_code=403, detail="Access denied")
     window = windows_db.get_window(app["window_id"])
     if window and window.get("archived"):
-        raise HTTPException(status_code=409, detail="Cannot delete an application in an archived window")
+        raise HTTPException(
+            status_code=409, detail="Cannot delete an application in an archived window"
+        )
     apps_db.delete_application(app_id)
 
 

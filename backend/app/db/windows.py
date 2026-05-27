@@ -29,7 +29,9 @@ def list_windows(window_type: Optional[WindowType] = None) -> list[dict]:
             IndexName="GSI1",
             KeyConditionExpression=Key("GSI1PK").eq(_gsi1pk(wt)),
         )
-        results.extend(item for item in resp.get("Items", []) if not item.get("archived"))
+        results.extend(
+            item for item in resp.get("Items", []) if not item.get("archived")
+        )
     return results
 
 
@@ -99,6 +101,8 @@ def get_active_live_window() -> Optional[dict]:
         KeyConditionExpression=Key("GSI1PK").eq(_gsi1pk(WindowType.live.value)),
     )
     for item in resp.get("Items", []):
-        if item.get("start_date", "") <= today <= item.get("end_date", "") and not item.get("archived"):
+        if item.get("start_date", "") <= today <= item.get(
+            "end_date", ""
+        ) and not item.get("archived"):
             return item
     return None
