@@ -11,6 +11,7 @@ export default function AdminDashboard() {
           <DashCard title="Application Windows" description="Create and manage scholarship windows and view submitted applications." to="/admin/windows" />
           <DashCard title="Reviewers" description="Invite or manage reviewer accounts." to="/admin/reviewers" />
           <DashCard title="Applicants" description="View, edit, or delete registered applicant accounts." to="/admin/applicants" />
+          <DashCard title="Admin Guide" description="Reference documentation for managing windows, reviewers, applicants, and applications." to="/admin/docs" />
         </div>
       </main>
       <Footer />

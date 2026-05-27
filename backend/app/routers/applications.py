@@ -27,6 +27,9 @@ def create_application(
     is_applicant = current_user["role"] == UserRole.applicant
     is_test_window = window.get("window_type") == "testing"
 
+    if window.get("archived"):
+        raise HTTPException(status_code=409, detail="Application window is archived")
+
     if not is_applicant and not is_test_window:
         raise HTTPException(
             status_code=403,
@@ -107,6 +110,8 @@ def save_application_data(
             status_code=400, detail="Cannot edit a submitted application"
         )
     window = windows_db.get_window(app["window_id"])
+    if window and window.get("archived"):
+        raise HTTPException(status_code=400, detail="Application window is archived")
     if (
         window
         and window.get("window_type") != "testing"
@@ -124,6 +129,9 @@ def delete_application(app_id: str, current_user: dict = Depends(get_current_use
         raise HTTPException(status_code=404, detail="Application not found")
     if app["owner_email"] != current_user["email"]:
         raise HTTPException(status_code=403, detail="Access denied")
+    window = windows_db.get_window(app["window_id"])
+    if window and window.get("archived"):
+        raise HTTPException(status_code=409, detail="Cannot delete an application in an archived window")
     apps_db.delete_application(app_id)
 
 
@@ -138,6 +146,9 @@ def submit_application(app_id: str, current_user: dict = Depends(get_current_use
         raise HTTPException(
             status_code=400, detail="Application is not in draft status"
         )
+    window = windows_db.get_window(app["window_id"])
+    if window and window.get("archived"):
+        raise HTTPException(status_code=400, detail="Application window is archived")
     apps_db.update_application_status(app_id, "submitted")
     return {"message": "Application submitted"}
 

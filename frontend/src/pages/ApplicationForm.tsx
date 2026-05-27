@@ -13,6 +13,7 @@ interface AppWindow {
   start_date: string
   end_date: string
   writing_prompt?: string
+  archived?: boolean
 }
 
 interface Application {
@@ -855,9 +856,11 @@ export default function ApplicationForm() {
   const isReviewerOrAdmin = role === 'admin' || role === 'reviewer'
   const isTestWindow = window_?.window_type === 'testing'
   const isOwner = app?.owner_email === email
+  const isArchived = !!window_?.archived
   const isEditable =
-    (isApplicant && app?.status === 'draft' && !!windowOpen) ||
-    (isReviewerOrAdmin && isTestWindow && isOwner && app?.status === 'draft')
+    !isArchived &&
+    ((isApplicant && app?.status === 'draft' && !!windowOpen) ||
+    (isReviewerOrAdmin && isTestWindow && isOwner && app?.status === 'draft'))
 
   const backPath = isReviewerOrAdmin
     ? `/admin/windows/${app?.window_id}`
@@ -999,7 +1002,12 @@ export default function ApplicationForm() {
           </div>
 
           {/* Read-only notice */}
-          {!isEditable && isApplicant && (
+          {!isEditable && isArchived && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+              This application window has been archived and is read-only.
+            </div>
+          )}
+          {!isEditable && !isArchived && isApplicant && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm text-yellow-800">
               {app.status !== 'draft'
                 ? 'This application has been submitted and can no longer be edited.'
@@ -1050,8 +1058,8 @@ export default function ApplicationForm() {
             </div>
           )}
 
-          {/* Delete button for read-only owner view (submitted / closed window) */}
-          {!isEditable && isOwner && (
+          {/* Delete button for read-only owner view (submitted / closed window) — hidden when archived */}
+          {!isEditable && isOwner && !isArchived && (
             <div className="flex justify-end">
               <button
                 onClick={() => setDeleteConfirm(true)}

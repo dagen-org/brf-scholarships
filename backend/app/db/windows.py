@@ -29,7 +29,18 @@ def list_windows(window_type: Optional[WindowType] = None) -> list[dict]:
             IndexName="GSI1",
             KeyConditionExpression=Key("GSI1PK").eq(_gsi1pk(wt)),
         )
-        results.extend(resp.get("Items", []))
+        results.extend(item for item in resp.get("Items", []) if not item.get("archived"))
+    return results
+
+
+def list_archived_windows() -> list[dict]:
+    results = []
+    for wt in WindowType:
+        resp = get_table().query(
+            IndexName="GSI1",
+            KeyConditionExpression=Key("GSI1PK").eq(_gsi1pk(wt.value)),
+        )
+        results.extend(item for item in resp.get("Items", []) if item.get("archived"))
     return results
 
 
@@ -65,6 +76,22 @@ def delete_window(window_id: str) -> None:
     get_table().delete_item(Key=_pk(window_id))
 
 
+def archive_window(window_id: str) -> None:
+    get_table().update_item(
+        Key=_pk(window_id),
+        UpdateExpression="SET archived = :v",
+        ExpressionAttributeValues={":v": True},
+    )
+
+
+def unarchive_window(window_id: str) -> None:
+    get_table().update_item(
+        Key=_pk(window_id),
+        UpdateExpression="SET archived = :v",
+        ExpressionAttributeValues={":v": False},
+    )
+
+
 def get_active_live_window() -> Optional[dict]:
     today = datetime.now(timezone.utc).date().isoformat()
     resp = get_table().query(
@@ -72,6 +99,6 @@ def get_active_live_window() -> Optional[dict]:
         KeyConditionExpression=Key("GSI1PK").eq(_gsi1pk(WindowType.live.value)),
     )
     for item in resp.get("Items", []):
-        if item.get("start_date", "") <= today <= item.get("end_date", ""):
+        if item.get("start_date", "") <= today <= item.get("end_date", "") and not item.get("archived"):
             return item
     return None

@@ -11,6 +11,7 @@ interface WindowItem {
   start_date: string
   end_date: string
   writing_prompt?: string
+  archived?: boolean
 }
 
 interface Application {
@@ -154,6 +155,14 @@ export default function AdminWindowApplications() {
                   {window_.window_type}
                 </span>
               </div>
+              {window_.archived && (
+                <div>
+                  <p className="text-gray-400 text-xs mb-1">Archive</p>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                    Archived
+                  </span>
+                </div>
+              )}
               <div>
                 <p className="text-gray-400 text-xs mb-1">Status</p>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[status]}`}>
@@ -174,8 +183,8 @@ export default function AdminWindowApplications() {
           )
         })()}
 
-        {/* Test application panel — only for testing windows */}
-        {!loading && window_?.window_type === 'testing' && (
+        {/* Test application panel — only for non-archived testing windows */}
+        {!loading && window_?.window_type === 'testing' && !window_?.archived && (
           <div className="bg-purple-50 border border-purple-200 rounded-xl p-5 space-y-3">
             <div>
               <p className="font-medium text-purple-900 text-sm">Start a Test Application</p>
