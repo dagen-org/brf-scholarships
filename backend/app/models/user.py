@@ -72,3 +72,11 @@ class ReviewerProfileUpdate(BaseModel):
 
 class AdminSetPasswordRequest(BaseModel):
     new_password: str
+
+
+class ApplicantProfileUpdate(BaseModel):
+    first_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone: Optional[str] = None
+    home_address: Optional[str] = None

@@ -9,6 +9,7 @@ import AcceptInvite from './pages/AcceptInvite'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminWindows from './pages/AdminWindows'
 import AdminReviewers from './pages/AdminReviewers'
+import AdminApplicants from './pages/AdminApplicants'
 import AdminWindowApplications from './pages/AdminWindowApplications'
 import ApplicantDashboard from './pages/ApplicantDashboard'
 import ApplicationForm from './pages/ApplicationForm'
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/admin/windows" element={<AdminWindows />} />
             <Route path="/admin/windows/:window_id" element={<AdminWindowApplications />} />
             <Route path="/admin/reviewers" element={<AdminReviewers />} />
+            <Route path="/admin/applicants" element={<AdminApplicants />} />
           </Route>
 
           <Route element={<PrivateRoute roles={['applicant']} />}>

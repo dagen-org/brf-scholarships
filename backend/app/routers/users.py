@@ -9,6 +9,7 @@ from app.models.user import (
     ChangePasswordRequest,
     InviteReviewerRequest,
     ReviewerProfileUpdate,
+    ApplicantProfileUpdate,
     AdminSetPasswordRequest,
     UserRole,
 )
@@ -110,4 +111,38 @@ def admin_set_reviewer_password(email: str, body: AdminSetPasswordRequest):
 )
 def delete_reviewer(email: str):
     _get_reviewer_or_404(email)
+    users_db.delete_user(email)
+
+
+@router.get("/applicants", dependencies=[Depends(require_admin)])
+def list_applicants():
+    return users_db.list_users_by_role(UserRole.applicant)
+
+
+def _get_applicant_or_404(email: str) -> dict:
+    user = users_db.get_user(email)
+    if not user or user.get("role") != UserRole.applicant:
+        raise HTTPException(status_code=404, detail="Applicant not found")
+    return user
+
+
+@router.put("/applicants/{email}", dependencies=[Depends(require_admin)])
+def update_applicant(email: str, body: ApplicantProfileUpdate):
+    _get_applicant_or_404(email)
+    users_db.update_user(email, body.model_dump(exclude_none=True))
+    return {"message": "Applicant updated"}
+
+
+@router.post("/applicants/{email}/set-password", dependencies=[Depends(require_admin)])
+def admin_set_applicant_password(email: str, body: AdminSetPasswordRequest):
+    _get_applicant_or_404(email)
+    users_db.update_user(email, {"hashed_password": hash_password(body.new_password)})
+    return {"message": "Password updated"}
+
+
+@router.delete(
+    "/applicants/{email}", dependencies=[Depends(require_admin)], status_code=204
+)
+def delete_applicant(email: str):
+    _get_applicant_or_404(email)
     users_db.delete_user(email)

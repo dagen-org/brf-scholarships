@@ -10,6 +10,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <DashCard title="Application Windows" description="Create and manage scholarship windows and view submitted applications." to="/admin/windows" />
           <DashCard title="Reviewers" description="Invite or manage reviewer accounts." to="/admin/reviewers" />
+          <DashCard title="Applicants" description="View, edit, or delete registered applicant accounts." to="/admin/applicants" />
         </div>
       </main>
       <Footer />
