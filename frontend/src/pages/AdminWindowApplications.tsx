@@ -135,7 +135,7 @@ export default function AdminWindowApplications() {
         </div>
       </nav>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full p-6 space-y-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-6">
         <div className="flex items-center gap-4">
           <Link to="/admin/windows" className="text-sm text-blue-600 hover:underline">← Application Windows</Link>
           <h2 className="text-xl font-semibold text-gray-800">
@@ -185,10 +185,10 @@ export default function AdminWindowApplications() {
 
         {/* Test application panel — only for non-archived testing windows */}
         {!loading && window_?.window_type === 'testing' && !window_?.archived && (
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-5 space-y-3">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5 space-y-3">
             <div>
-              <p className="font-medium text-purple-900 text-sm">Start a Test Application</p>
-              <p className="text-xs text-purple-700 mt-0.5">
+              <p className="font-medium text-yellow-900 text-sm">Start a Test Application</p>
+              <p className="text-xs text-yellow-700 mt-0.5">
                 Testing windows allow admins and reviewers to submit test applications.
               </p>
             </div>
@@ -199,7 +199,7 @@ export default function AdminWindowApplications() {
                   key={type}
                   onClick={() => startTestApplication(type)}
                   disabled={!!starting}
-                  className="text-sm bg-white border border-purple-300 text-purple-800 px-3 py-1.5 rounded-lg hover:bg-purple-100 disabled:opacity-50"
+                  className="text-sm bg-white border border-yellow-300 text-yellow-800 px-3 py-1.5 rounded-lg hover:bg-purple-100 disabled:opacity-50"
                 >
                   {starting === type ? 'Starting…' : label}
                 </button>

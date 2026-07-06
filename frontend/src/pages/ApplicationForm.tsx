@@ -961,7 +961,7 @@ export default function ApplicationForm() {
         </div>
       </nav>
 
-      <div className="flex-1 flex max-w-5xl mx-auto w-full px-4 py-6 gap-6">
+      <div className="flex-1 flex max-w-6xl mx-auto w-full px-4 py-6 gap-6">
 
         {/* Sidebar */}
         <aside className="hidden md:block w-44 shrink-0">
@@ -980,7 +980,7 @@ export default function ApplicationForm() {
         </aside>
 
         {/* Main content */}
-        <div className="flex-1 space-y-4 min-w-0">
+        <div className="flex-1 space-y-4 min-w-0 max-w-6xl">
 
           {/* Header */}
           <div className="bg-white rounded-xl shadow px-5 py-4 flex flex-wrap items-center gap-3">

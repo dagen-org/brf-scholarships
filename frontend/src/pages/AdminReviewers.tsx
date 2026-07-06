@@ -148,7 +148,7 @@ export default function AdminReviewers() {
         </div>
       </nav>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full p-6 space-y-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/admin" className="text-sm text-blue-600 hover:underline">← Dashboard</Link>

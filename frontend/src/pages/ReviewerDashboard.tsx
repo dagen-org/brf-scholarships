@@ -13,7 +13,7 @@ export default function ReviewerDashboard() {
           <button onClick={logout} className="text-red-500 hover:underline">Sign out</button>
         </div>
       </nav>
-      <main className="flex-1 max-w-5xl mx-auto w-full p-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-6">
         <h2 className="text-xl font-semibold mb-4">Applications to Review</h2>
         <div className="bg-white rounded-xl shadow p-6 text-sm text-gray-500">
           Application list coming soon.

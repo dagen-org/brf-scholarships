@@ -109,7 +109,7 @@ export default function ApplicantDashboard() {
         </div>
       </nav>
 
-      <main className="flex-1 max-w-3xl mx-auto w-full p-6 space-y-8">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-8">
 
         {loading ? (
           <p className="text-sm text-gray-400">Loading...</p>
