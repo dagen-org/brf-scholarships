@@ -26,7 +26,8 @@ function formatDate(iso: string): string {
 }
 
 export default function AdminApplicants() {
-  const { email: adminEmail, logout } = useAuth()
+  const { email: adminEmail, role, logout } = useAuth()
+  const isAdmin = role === 'admin'
   const [applicants, setApplicants] = useState<Applicant[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -133,7 +134,7 @@ export default function AdminApplicants() {
         </div>
 
         {/* Edit form */}
-        {formMode !== null && (
+        {isAdmin && formMode !== null && (
           <div className="bg-white rounded-xl shadow p-6">
             <h3 className="font-semibold text-gray-800 mb-1">Edit Applicant</h3>
             <p className="text-sm text-gray-500 mb-4">{formMode}</p>
@@ -226,7 +227,7 @@ export default function AdminApplicants() {
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Email</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Registered</th>
-                  <th className="px-4 py-3" />
+                  {isAdmin && <th className="px-4 py-3" />}
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -247,41 +248,43 @@ export default function AdminApplicants() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-500">{formatDate(a.created_at)}</td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        {isConfirming ? (
-                          <span className="flex items-center justify-end gap-2">
-                            <span className="text-xs text-gray-500">Delete?</span>
-                            <button
-                              onClick={() => handleDelete(a.email)}
-                              disabled={deleting}
-                              className="text-xs text-red-600 font-medium hover:underline disabled:opacity-50"
-                            >
-                              Yes
-                            </button>
-                            <button
-                              onClick={() => setConfirmDeleteEmail(null)}
-                              className="text-xs text-gray-500 hover:underline"
-                            >
-                              Cancel
-                            </button>
-                          </span>
-                        ) : (
-                          <span className="flex items-center justify-end gap-3">
-                            <button
-                              onClick={() => openEdit(a)}
-                              className="text-xs text-blue-600 hover:underline"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => { setConfirmDeleteEmail(a.email); closeForm() }}
-                              className="text-xs text-red-500 hover:underline"
-                            >
-                              Delete
-                            </button>
-                          </span>
-                        )}
-                      </td>
+                      {isAdmin && (
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          {isConfirming ? (
+                            <span className="flex items-center justify-end gap-2">
+                              <span className="text-xs text-gray-500">Delete?</span>
+                              <button
+                                onClick={() => handleDelete(a.email)}
+                                disabled={deleting}
+                                className="text-xs text-red-600 font-medium hover:underline disabled:opacity-50"
+                              >
+                                Yes
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteEmail(null)}
+                                className="text-xs text-gray-500 hover:underline"
+                              >
+                                Cancel
+                              </button>
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-end gap-3">
+                              <button
+                                onClick={() => openEdit(a)}
+                                className="text-xs text-blue-600 hover:underline"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => { setConfirmDeleteEmail(a.email); closeForm() }}
+                                className="text-xs text-red-500 hover:underline"
+                              >
+                                Delete
+                              </button>
+                            </span>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   )
                 })}

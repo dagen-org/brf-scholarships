@@ -40,7 +40,7 @@ def get_window(window_id: str):
     return window
 
 
-@router.put("/{window_id}", dependencies=[Depends(require_admin)])
+@router.put("/{window_id}", dependencies=[Depends(require_reviewer_or_admin)])
 def update_window(window_id: str, body: WindowCreate):
     existing = windows_db.get_window(window_id)
     if not existing:

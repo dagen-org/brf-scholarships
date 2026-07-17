@@ -10,6 +10,7 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<string>
+  setSession: (token: string, role: string, email: string) => void
   logout: () => void
   isAuthenticated: boolean
 }
@@ -23,13 +24,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: localStorage.getItem('email'),
   })
 
+  function setSession(token: string, role: string, email: string) {
+    localStorage.setItem('token', token)
+    localStorage.setItem('role', role)
+    localStorage.setItem('email', email)
+    flushSync(() => setAuth({ token, role, email }))
+  }
+
   async function login(email: string, password: string): Promise<string> {
     const res = await api.post('/auth/login', { email, password })
     const { access_token, role } = res.data
-    localStorage.setItem('token', access_token)
-    localStorage.setItem('role', role)
-    localStorage.setItem('email', email)
-    flushSync(() => setAuth({ token: access_token, role, email }))
+    setSession(access_token, role, email)
     return role
   }
 
@@ -39,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, logout, isAuthenticated: !!auth.token }}>
+    <AuthContext.Provider value={{ ...auth, login, setSession, logout, isAuthenticated: !!auth.token }}>
       {children}
     </AuthContext.Provider>
   )

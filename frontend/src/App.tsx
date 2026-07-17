@@ -29,12 +29,15 @@ export default function App() {
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/setup" element={<Bootstrap />} />
 
-          <Route element={<PrivateRoute roles={['admin']} />}>
+          <Route element={<PrivateRoute roles={['admin', 'reviewer']} />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/windows" element={<AdminWindows />} />
             <Route path="/admin/windows/:window_id" element={<AdminWindowApplications />} />
-            <Route path="/admin/reviewers" element={<AdminReviewers />} />
             <Route path="/admin/applicants" element={<AdminApplicants />} />
+          </Route>
+
+          <Route element={<PrivateRoute roles={['admin']} />}>
+            <Route path="/admin/reviewers" element={<AdminReviewers />} />
             <Route path="/admin/docs" element={<AdminDocs />} />
           </Route>
 

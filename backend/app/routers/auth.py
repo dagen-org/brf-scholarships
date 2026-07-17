@@ -119,4 +119,4 @@ def accept_invite(body: AcceptInviteRequest):
         },
     )
     token = create_access_token(user["email"], user["role"])
-    return {"access_token": token, "token_type": "bearer", "role": user["role"]}
+    return {"access_token": token, "token_type": "bearer", "role": user["role"], "email": user["email"]}

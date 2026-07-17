@@ -1,7 +1,7 @@
 import secrets
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import get_current_user, require_admin
+from app.core.deps import get_current_user, require_admin, require_reviewer_or_admin
 from app.core.security import hash_password, verify_password
 from app.db import users as users_db
 from app.models.user import (
@@ -114,7 +114,7 @@ def delete_reviewer(email: str):
     users_db.delete_user(email)
 
 
-@router.get("/applicants", dependencies=[Depends(require_admin)])
+@router.get("/applicants", dependencies=[Depends(require_reviewer_or_admin)])
 def list_applicants():
     return users_db.list_users_by_role(UserRole.applicant)
 
