@@ -1,4 +1,4 @@
-make .PHONY: up down logs setup dev-backend dev-frontend install install-backend install-frontend lint test
+make .PHONY: up down logs setup dev-backend dev-frontend install install-backend install-frontend install-hooks lint test
 
 VENV   := backend/.venv
 PYTHON := $(VENV)/bin/python
@@ -32,7 +32,7 @@ dev-frontend:
 
 # ── Install ──────────────────────────────────────────────────────────────────
 
-install: install-backend install-frontend
+install: install-backend install-frontend install-hooks
 
 $(VENV):
 	python3 -m venv $(VENV)
@@ -42,6 +42,9 @@ install-backend: $(VENV)
 
 install-frontend:
 	cd frontend && npm install
+
+install-hooks:
+	git config core.hooksPath .githooks
 
 # ── Quality ──────────────────────────────────────────────────────────────────
 
