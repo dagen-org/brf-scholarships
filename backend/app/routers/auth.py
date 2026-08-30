@@ -1,18 +1,19 @@
 import secrets
+
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import create_access_token, hash_password, verify_password
 from app.db import users as users_db
 from app.models.user import (
-    RegisterRequest,
-    LoginRequest,
-    VerifyEmailRequest,
-    ResetPasswordRequest,
-    ConfirmResetRequest,
     AcceptInviteRequest,
+    ConfirmResetRequest,
+    LoginRequest,
+    RegisterRequest,
+    ResetPasswordRequest,
     UserRole,
+    VerifyEmailRequest,
 )
-from app.services.email import send_verification_email, send_password_reset_email
+from app.services.email import send_password_reset_email, send_verification_email
 
 router = APIRouter()
 

@@ -1,10 +1,11 @@
 import uuid
+
 import boto3
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from app.core.config import settings
-from app.core.deps import get_current_user
+from app.core.deps import CurrentUser
 from app.db import applications as apps_db
 from app.models.user import UserRole
 
@@ -33,9 +34,7 @@ def _s3_client():
 
 
 @router.post("/upload-url")
-def get_upload_url(
-    body: PresignedUrlRequest, current_user: dict = Depends(get_current_user)
-):
+def get_upload_url(body: PresignedUrlRequest, current_user: CurrentUser):
     if body.content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=400, detail="File type not allowed. Use PDF, DOCX, or TXT."
@@ -77,7 +76,7 @@ def get_upload_url(
 
 
 @router.get("/{app_id}")
-def list_files(app_id: str, current_user: dict = Depends(get_current_user)):
+def list_files(app_id: str, current_user: CurrentUser):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")

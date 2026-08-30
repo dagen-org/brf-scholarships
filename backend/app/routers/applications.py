@@ -1,8 +1,8 @@
-from datetime import date as date_type
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import get_current_user, require_reviewer_or_admin
+from app.core.deps import CurrentUser, require_reviewer_or_admin
 from app.db import applications as apps_db
 from app.db import windows as windows_db
 from app.models.application import (
@@ -17,9 +17,7 @@ router = APIRouter()
 
 
 @router.post("/", status_code=201)
-def create_application(
-    body: ApplicationCreate, current_user: dict = Depends(get_current_user)
-):
+def create_application(body: ApplicationCreate, current_user: CurrentUser):
     window = windows_db.get_window(body.window_id)
     if not window:
         raise HTTPException(status_code=404, detail="Application window not found")
@@ -51,7 +49,7 @@ def create_application(
 
 
 @router.get("/mine")
-def get_my_applications(current_user: dict = Depends(get_current_user)):
+def get_my_applications(current_user: CurrentUser):
     return apps_db.get_applications_by_user(current_user["email"])
 
 
@@ -69,7 +67,7 @@ def close_window_applications(window_id: str):
     window = windows_db.get_window(window_id)
     if not window:
         raise HTTPException(status_code=404, detail="Window not found")
-    today = date_type.today().isoformat()
+    today = datetime.now(timezone.utc).date().isoformat()
     if window["end_date"] >= today:
         raise HTTPException(status_code=400, detail="Window has not yet closed")
     apps = apps_db.get_applications_by_window(window_id)
@@ -82,7 +80,7 @@ def close_window_applications(window_id: str):
 
 
 @router.get("/{app_id}")
-def get_application(app_id: str, current_user: dict = Depends(get_current_user)):
+def get_application(app_id: str, current_user: CurrentUser):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -96,9 +94,7 @@ def get_application(app_id: str, current_user: dict = Depends(get_current_user))
 
 @router.put("/{app_id}/data")
 def save_application_data(
-    app_id: str,
-    body: ApplicationDataUpdate,
-    current_user: dict = Depends(get_current_user),
+    app_id: str, body: ApplicationDataUpdate, current_user: CurrentUser
 ):
     app = apps_db.get_application(app_id)
     if not app:
@@ -115,7 +111,7 @@ def save_application_data(
     if (
         window
         and window.get("window_type") != "testing"
-        and date_type.today().isoformat() > window["end_date"]
+        and datetime.now(timezone.utc).date().isoformat() > window["end_date"]
     ):
         raise HTTPException(status_code=400, detail="Application window has closed")
     apps_db.update_application_data(app_id, body.data)
@@ -123,7 +119,7 @@ def save_application_data(
 
 
 @router.delete("/{app_id}", status_code=204)
-def delete_application(app_id: str, current_user: dict = Depends(get_current_user)):
+def delete_application(app_id: str, current_user: CurrentUser):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -138,7 +134,7 @@ def delete_application(app_id: str, current_user: dict = Depends(get_current_use
 
 
 @router.post("/{app_id}/submit")
-def submit_application(app_id: str, current_user: dict = Depends(get_current_user)):
+def submit_application(app_id: str, current_user: CurrentUser):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -168,9 +164,7 @@ def get_comments(app_id: str):
     dependencies=[Depends(require_reviewer_or_admin)],
     status_code=201,
 )
-def add_comment(
-    app_id: str, body: CommentCreate, current_user: dict = Depends(get_current_user)
-):
+def add_comment(app_id: str, body: CommentCreate, current_user: CurrentUser):
     app = apps_db.get_application(app_id)
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -184,10 +178,7 @@ def add_comment(
     dependencies=[Depends(require_reviewer_or_admin)],
 )
 def update_comment(
-    app_id: str,
-    comment_id: str,
-    body: CommentUpdate,
-    current_user: dict = Depends(get_current_user),
+    app_id: str, comment_id: str, body: CommentUpdate, current_user: CurrentUser
 ):
     comment = apps_db.get_comment(app_id, comment_id)
     if not comment:
@@ -203,11 +194,7 @@ def update_comment(
     dependencies=[Depends(require_reviewer_or_admin)],
     status_code=204,
 )
-def delete_comment(
-    app_id: str,
-    comment_id: str,
-    current_user: dict = Depends(get_current_user),
-):
+def delete_comment(app_id: str, comment_id: str, current_user: CurrentUser):
     comment = apps_db.get_comment(app_id, comment_id)
     if not comment:
         raise HTTPException(status_code=404, detail="Note not found")

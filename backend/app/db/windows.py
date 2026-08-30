@@ -1,6 +1,5 @@
-from datetime import datetime, timezone
-from typing import Optional
 import uuid
+from datetime import datetime, timezone
 
 from boto3.dynamodb.conditions import Key
 
@@ -12,7 +11,7 @@ def _pk(window_id: str) -> dict:
     return {"PK": f"WINDOW#{window_id}", "SK": "METADATA"}
 
 
-def get_window(window_id: str) -> Optional[dict]:
+def get_window(window_id: str) -> dict | None:
     resp = get_table().get_item(Key=_pk(window_id))
     return resp.get("Item")
 
@@ -21,7 +20,7 @@ def _gsi1pk(window_type: str) -> str:
     return f"WINDOWTYPE#{window_type}"
 
 
-def list_windows(window_type: Optional[WindowType] = None) -> list[dict]:
+def list_windows(window_type: WindowType | None = None) -> list[dict]:
     types = [window_type.value] if window_type else [wt.value for wt in WindowType]
     results = []
     for wt in types:
@@ -60,7 +59,7 @@ def create_window(data: dict) -> dict:
     return item
 
 
-def update_window(window_id: str, data: dict) -> Optional[dict]:
+def update_window(window_id: str, data: dict) -> dict | None:
     existing = get_window(window_id)
     if not existing:
         return None
@@ -94,7 +93,7 @@ def unarchive_window(window_id: str) -> None:
     )
 
 
-def get_active_live_window() -> Optional[dict]:
+def get_active_live_window() -> dict | None:
     today = datetime.now(timezone.utc).date().isoformat()
     resp = get_table().query(
         IndexName="GSI1",

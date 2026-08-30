@@ -1,6 +1,5 @@
-from datetime import datetime, timezone
-from typing import Optional
 import uuid
+from datetime import datetime, timezone
 
 from boto3.dynamodb.conditions import Key
 
@@ -11,7 +10,7 @@ def _pk(app_id: str) -> dict:
     return {"PK": f"APPLICATION#{app_id}", "SK": "METADATA"}
 
 
-def get_application(app_id: str) -> Optional[dict]:
+def get_application(app_id: str) -> dict | None:
     resp = get_table().get_item(Key=_pk(app_id))
     return resp.get("Item")
 
@@ -141,7 +140,7 @@ def add_comment(
     return item
 
 
-def get_comment(app_id: str, comment_id: str) -> Optional[dict]:
+def get_comment(app_id: str, comment_id: str) -> dict | None:
     resp = get_table().get_item(
         Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"}
     )

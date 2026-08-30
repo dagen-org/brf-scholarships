@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
+
 import bcrypt as _bcrypt
-from jose import jwt, JWTError
 from fastapi import HTTPException, status
+from jose import JWTError, jwt
 
 from app.core.config import settings
 

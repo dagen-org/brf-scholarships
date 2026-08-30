@@ -1,6 +1,6 @@
 from enum import Enum
+
 from pydantic import BaseModel
-from typing import Optional
 
 
 class WindowType(str, Enum):
@@ -13,7 +13,7 @@ class WindowCreate(BaseModel):
     window_type: WindowType
     start_date: str  # ISO date string
     end_date: str
-    writing_prompt: Optional[str] = None
+    writing_prompt: str | None = None
 
 
 class WindowPublic(BaseModel):
@@ -22,5 +22,5 @@ class WindowPublic(BaseModel):
     window_type: WindowType
     start_date: str
     end_date: str
-    writing_prompt: Optional[str] = None
+    writing_prompt: str | None = None
     created_at: str

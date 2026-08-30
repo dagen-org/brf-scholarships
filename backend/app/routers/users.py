@@ -1,16 +1,17 @@
 import secrets
+
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import get_current_user, require_reviewer_or_admin
+from app.core.deps import CurrentUser, require_reviewer_or_admin
 from app.core.security import hash_password, verify_password
 from app.db import users as users_db
 from app.models.user import (
-    UserProfile,
+    AdminSetPasswordRequest,
+    ApplicantProfileUpdate,
     ChangePasswordRequest,
     InviteReviewerRequest,
     ReviewerProfileUpdate,
-    ApplicantProfileUpdate,
-    AdminSetPasswordRequest,
+    UserProfile,
     UserRole,
 )
 from app.services.email import send_reviewer_invite_email
@@ -19,7 +20,7 @@ router = APIRouter()
 
 
 @router.get("/me")
-def get_me(current_user: dict = Depends(get_current_user)):
+def get_me(current_user: CurrentUser):
     user = users_db.get_user(current_user["email"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -38,15 +39,13 @@ def get_me(current_user: dict = Depends(get_current_user)):
 
 
 @router.put("/me/profile")
-def update_profile(body: UserProfile, current_user: dict = Depends(get_current_user)):
+def update_profile(body: UserProfile, current_user: CurrentUser):
     users_db.update_user(current_user["email"], body.model_dump(exclude_none=True))
     return {"message": "Profile updated"}
 
 
 @router.post("/me/change-password")
-def change_password(
-    body: ChangePasswordRequest, current_user: dict = Depends(get_current_user)
-):
+def change_password(body: ChangePasswordRequest, current_user: CurrentUser):
     user = users_db.get_user(current_user["email"])
     if not verify_password(body.current_password, user["hashed_password"]):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
@@ -76,7 +75,7 @@ def invite_reviewer(body: InviteReviewerRequest):
     )
     try:
         send_reviewer_invite_email(body.email, token)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 — SES/SMTP raise different families; any failure must roll back the created user
         users_db.delete_user(body.email)
         raise HTTPException(
             status_code=502, detail=f"Failed to send invitation email: {exc}"

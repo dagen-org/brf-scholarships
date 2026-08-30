@@ -1,6 +1,5 @@
-from pydantic_settings import BaseSettings
 from pydantic import field_validator
-from typing import List
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -28,7 +27,7 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:5173"
 
     # CORS
-    cors_origins: List[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:5173"]
 
     @field_validator("cors_origins", mode="before")
     @classmethod

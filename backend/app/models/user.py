@@ -1,6 +1,6 @@
 from enum import Enum
+
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
 
 class UserRole(str, Enum):
@@ -10,11 +10,11 @@ class UserRole(str, Enum):
 
 
 class UserProfile(BaseModel):
-    first_name: Optional[str] = None
-    middle_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone: Optional[str] = None
-    home_address: Optional[str] = None
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+    home_address: str | None = None
 
 
 class UserPublic(BaseModel):
@@ -64,10 +64,10 @@ class AcceptInviteRequest(BaseModel):
 
 
 class ReviewerProfileUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone: Optional[str] = None
-    home_address: Optional[str] = None
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+    home_address: str | None = None
 
 
 class AdminSetPasswordRequest(BaseModel):
@@ -75,8 +75,8 @@ class AdminSetPasswordRequest(BaseModel):
 
 
 class ApplicantProfileUpdate(BaseModel):
-    first_name: Optional[str] = None
-    middle_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone: Optional[str] = None
-    home_address: Optional[str] = None
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+    home_address: str | None = None
