@@ -2,7 +2,7 @@ from datetime import date as date_type
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import get_current_user, require_admin, require_reviewer_or_admin
+from app.core.deps import get_current_user, require_reviewer_or_admin
 from app.db import applications as apps_db
 from app.db import windows as windows_db
 from app.models.application import (
@@ -62,7 +62,7 @@ def get_applications_for_window(window_id: str):
 
 @router.post(
     "/window/{window_id}/close",
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_reviewer_or_admin)],
 )
 def close_window_applications(window_id: str):
     """Auto-submit all draft applications for a closed window."""

@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import require_admin, require_reviewer_or_admin
+from app.core.deps import require_reviewer_or_admin
 from app.db import windows as windows_db
 from app.models.window import WindowCreate, WindowType
 
 router = APIRouter()
 
 
-@router.post("/", dependencies=[Depends(require_admin)], status_code=201)
+@router.post("/", dependencies=[Depends(require_reviewer_or_admin)], status_code=201)
 def create_window(body: WindowCreate):
     window = windows_db.create_window(body.model_dump(mode="json"))
     return window
@@ -51,7 +51,9 @@ def update_window(window_id: str, body: WindowCreate):
     return updated
 
 
-@router.delete("/{window_id}", dependencies=[Depends(require_admin)], status_code=204)
+@router.delete(
+    "/{window_id}", dependencies=[Depends(require_reviewer_or_admin)], status_code=204
+)
 def delete_window(window_id: str):
     window = windows_db.get_window(window_id)
     if not window:
@@ -61,7 +63,7 @@ def delete_window(window_id: str):
     windows_db.delete_window(window_id)
 
 
-@router.post("/{window_id}/archive", dependencies=[Depends(require_admin)])
+@router.post("/{window_id}/archive", dependencies=[Depends(require_reviewer_or_admin)])
 def archive_window(window_id: str):
     window = windows_db.get_window(window_id)
     if not window:
@@ -72,7 +74,9 @@ def archive_window(window_id: str):
     return {**window, "archived": True}
 
 
-@router.post("/{window_id}/unarchive", dependencies=[Depends(require_admin)])
+@router.post(
+    "/{window_id}/unarchive", dependencies=[Depends(require_reviewer_or_admin)]
+)
 def unarchive_window(window_id: str):
     window = windows_db.get_window(window_id)
     if not window:

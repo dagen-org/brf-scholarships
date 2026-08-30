@@ -34,9 +34,6 @@ export default function App() {
             <Route path="/admin/windows" element={<AdminWindows />} />
             <Route path="/admin/windows/:window_id" element={<AdminWindowApplications />} />
             <Route path="/admin/applicants" element={<AdminApplicants />} />
-          </Route>
-
-          <Route element={<PrivateRoute roles={['admin']} />}>
             <Route path="/admin/reviewers" element={<AdminReviewers />} />
             <Route path="/admin/docs" element={<AdminDocs />} />
           </Route>

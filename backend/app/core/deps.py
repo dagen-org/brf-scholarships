@@ -14,14 +14,6 @@ def get_current_user(
     return {"email": payload["sub"], "role": payload["role"]}
 
 
-def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
-    if current_user["role"] != UserRole.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
-        )
-    return current_user
-
-
 def require_reviewer_or_admin(current_user: dict = Depends(get_current_user)) -> dict:
     if current_user["role"] not in (UserRole.admin, UserRole.reviewer):
         raise HTTPException(

@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 import PublicNav from '../components/PublicNav'
-import { useAuth } from '../contexts/AuthContext'
 
 const COLOR_STYLES = {
   blue:   { card: 'bg-blue-50 border-l-4 border-blue-500 hover:bg-blue-100', title: 'text-blue-900' },
@@ -13,22 +12,15 @@ const COLOR_STYLES = {
 type CardColor = keyof typeof COLOR_STYLES
 
 export default function AdminDashboard() {
-  const { role } = useAuth()
-  const isAdmin = role === 'admin'
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <PublicNav />
       <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <DashCard title="Application Windows" description="View and edit scholarship windows and their submitted applications." to="/admin/windows" color="blue" />
-          {isAdmin && (
-            <DashCard title="Reviewers" description="Invite or manage reviewer accounts." to="/admin/reviewers" color="purple" />
-          )}
+          <DashCard title="Reviewers" description="Invite or manage reviewer accounts." to="/admin/reviewers" color="purple" />
           <DashCard title="Applicants" description="View registered applicant accounts." to="/admin/applicants" color="green" />
-          {isAdmin && (
-            <DashCard title="Admin Guide" description="Reference documentation for managing windows, reviewers, applicants, and applications." to="/admin/docs" color="amber" />
-          )}
+          <DashCard title="Admin Guide" description="Reference documentation for managing windows, reviewers, applicants, and applications." to="/admin/docs" color="amber" />
         </div>
       </main>
       <Footer />

@@ -34,8 +34,7 @@ const TYPE_STYLES = {
 }
 
 export default function AdminWindows() {
-  const { email, role, logout } = useAuth()
-  const isAdmin = role === 'admin'
+  const { email, logout } = useAuth()
   const [windows, setWindows] = useState<WindowItem[]>([])
   const [archivedWindows, setArchivedWindows] = useState<WindowItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -192,7 +191,7 @@ export default function AdminWindows() {
             <Link to="/admin" className="text-sm text-blue-600 hover:underline">← Dashboard</Link>
             <h2 className="text-xl font-semibold text-gray-800">Application Windows</h2>
           </div>
-          {isAdmin && formMode === null && (
+          {formMode === null && (
             <button
               onClick={openCreate}
               className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -375,22 +374,18 @@ export default function AdminWindows() {
                             >
                               Edit
                             </button>
-                            {isAdmin && (
-                              <>
-                                <button
-                                  onClick={() => { setConfirmArchiveId(w.window_id); setConfirmDeleteId(null); closeForm() }}
-                                  className="text-xs text-amber-600 hover:underline"
-                                >
-                                  Archive
-                                </button>
-                                <button
-                                  onClick={() => { setConfirmDeleteId(w.window_id); setConfirmArchiveId(null); closeForm() }}
-                                  className="text-xs text-red-500 hover:underline"
-                                >
-                                  Delete
-                                </button>
-                              </>
-                            )}
+                            <button
+                              onClick={() => { setConfirmArchiveId(w.window_id); setConfirmDeleteId(null); closeForm() }}
+                              className="text-xs text-amber-600 hover:underline"
+                            >
+                              Archive
+                            </button>
+                            <button
+                              onClick={() => { setConfirmDeleteId(w.window_id); setConfirmArchiveId(null); closeForm() }}
+                              className="text-xs text-red-500 hover:underline"
+                            >
+                              Delete
+                            </button>
                           </span>
                         )}
                       </td>
@@ -468,14 +463,12 @@ export default function AdminWindows() {
                               >
                                 Applications
                               </Link>
-                              {isAdmin && (
-                                <button
-                                  onClick={() => setConfirmUnarchiveId(w.window_id)}
-                                  className="text-xs text-blue-600 hover:underline"
-                                >
-                                  Unarchive
-                                </button>
-                              )}
+                              <button
+                                onClick={() => setConfirmUnarchiveId(w.window_id)}
+                                className="text-xs text-blue-600 hover:underline"
+                              >
+                                Unarchive
+                              </button>
                             </span>
                           )}
                         </td>

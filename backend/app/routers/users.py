@@ -1,7 +1,7 @@
 import secrets
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.deps import get_current_user, require_admin, require_reviewer_or_admin
+from app.core.deps import get_current_user, require_reviewer_or_admin
 from app.core.security import hash_password, verify_password
 from app.db import users as users_db
 from app.models.user import (
@@ -56,7 +56,11 @@ def change_password(
     return {"message": "Password changed"}
 
 
-@router.post("/invite-reviewer", dependencies=[Depends(require_admin)], status_code=201)
+@router.post(
+    "/invite-reviewer",
+    dependencies=[Depends(require_reviewer_or_admin)],
+    status_code=201,
+)
 def invite_reviewer(body: InviteReviewerRequest):
     if users_db.get_user(body.email):
         raise HTTPException(status_code=409, detail="Email already registered")
@@ -80,7 +84,7 @@ def invite_reviewer(body: InviteReviewerRequest):
     return {"message": "Invitation sent"}
 
 
-@router.get("/reviewers", dependencies=[Depends(require_admin)])
+@router.get("/reviewers", dependencies=[Depends(require_reviewer_or_admin)])
 def list_reviewers():
     return users_db.list_users_by_role(UserRole.reviewer)
 
@@ -92,14 +96,16 @@ def _get_reviewer_or_404(email: str) -> dict:
     return user
 
 
-@router.put("/reviewers/{email}", dependencies=[Depends(require_admin)])
+@router.put("/reviewers/{email}", dependencies=[Depends(require_reviewer_or_admin)])
 def update_reviewer(email: str, body: ReviewerProfileUpdate):
     _get_reviewer_or_404(email)
     users_db.update_user(email, body.model_dump(exclude_none=True))
     return {"message": "Reviewer updated"}
 
 
-@router.post("/reviewers/{email}/set-password", dependencies=[Depends(require_admin)])
+@router.post(
+    "/reviewers/{email}/set-password", dependencies=[Depends(require_reviewer_or_admin)]
+)
 def admin_set_reviewer_password(email: str, body: AdminSetPasswordRequest):
     _get_reviewer_or_404(email)
     users_db.update_user(email, {"hashed_password": hash_password(body.new_password)})
@@ -107,7 +113,9 @@ def admin_set_reviewer_password(email: str, body: AdminSetPasswordRequest):
 
 
 @router.delete(
-    "/reviewers/{email}", dependencies=[Depends(require_admin)], status_code=204
+    "/reviewers/{email}",
+    dependencies=[Depends(require_reviewer_or_admin)],
+    status_code=204,
 )
 def delete_reviewer(email: str):
     _get_reviewer_or_404(email)
@@ -126,14 +134,17 @@ def _get_applicant_or_404(email: str) -> dict:
     return user
 
 
-@router.put("/applicants/{email}", dependencies=[Depends(require_admin)])
+@router.put("/applicants/{email}", dependencies=[Depends(require_reviewer_or_admin)])
 def update_applicant(email: str, body: ApplicantProfileUpdate):
     _get_applicant_or_404(email)
     users_db.update_user(email, body.model_dump(exclude_none=True))
     return {"message": "Applicant updated"}
 
 
-@router.post("/applicants/{email}/set-password", dependencies=[Depends(require_admin)])
+@router.post(
+    "/applicants/{email}/set-password",
+    dependencies=[Depends(require_reviewer_or_admin)],
+)
 def admin_set_applicant_password(email: str, body: AdminSetPasswordRequest):
     _get_applicant_or_404(email)
     users_db.update_user(email, {"hashed_password": hash_password(body.new_password)})
@@ -141,7 +152,9 @@ def admin_set_applicant_password(email: str, body: AdminSetPasswordRequest):
 
 
 @router.delete(
-    "/applicants/{email}", dependencies=[Depends(require_admin)], status_code=204
+    "/applicants/{email}",
+    dependencies=[Depends(require_reviewer_or_admin)],
+    status_code=204,
 )
 def delete_applicant(email: str):
     _get_applicant_or_404(email)
