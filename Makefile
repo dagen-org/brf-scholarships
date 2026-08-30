@@ -1,4 +1,4 @@
-.PHONY: up down logs setup dev-backend dev-frontend install install-backend install-frontend lint test
+make .PHONY: up down logs setup dev-backend dev-frontend install install-backend install-frontend install-hooks lint test
 
 VENV   := backend/.venv
 PYTHON := $(VENV)/bin/python
@@ -7,13 +7,13 @@ PIP    := $(VENV)/bin/pip
 # ── Docker ──────────────────────────────────────────────────────────────────
 
 up:
-	docker compose up -d
+	podman compose up -d
 
 down:
-	docker compose down
+	podman compose down
 
 logs:
-	docker compose logs -f
+	podman compose logs -f
 
 # ── Setup ────────────────────────────────────────────────────────────────────
 
@@ -25,14 +25,14 @@ setup: up
 # ── Development ──────────────────────────────────────────────────────────────
 
 dev-backend:
-	cd backend && .venv/bin/uvicorn app.main:app --reload --port 8080
+	cd backend && .venv/bin/uvicorn app.main:app --reload --port 8080 --host 0.0.0.0
 
 dev-frontend:
 	cd frontend && npm run dev
 
 # ── Install ──────────────────────────────────────────────────────────────────
 
-install: install-backend install-frontend
+install: install-backend install-frontend install-hooks
 
 $(VENV):
 	python3 -m venv $(VENV)
@@ -42,6 +42,9 @@ install-backend: $(VENV)
 
 install-frontend:
 	cd frontend && npm install
+
+install-hooks:
+	git config core.hooksPath .githooks
 
 # ── Quality ──────────────────────────────────────────────────────────────────
 

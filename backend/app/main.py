@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
 from app.core.config import settings
-from app.routers import auth, users, applications, windows, files
+from app.routers import applications, auth, files, users, windows
 
 app = FastAPI(title="BRF Scholarships API", version="0.1.0")
 
@@ -17,7 +17,9 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
-app.include_router(applications.router, prefix="/api/applications", tags=["applications"])
+app.include_router(
+    applications.router, prefix="/api/applications", tags=["applications"]
+)
 app.include_router(windows.router, prefix="/api/windows", tags=["windows"])
 app.include_router(files.router, prefix="/api/files", tags=["files"])
 

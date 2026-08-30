@@ -8,7 +8,9 @@ export default function About() {
         <div>
           <h1 className="text-3xl font-bold text-blue-800 mb-3">About the Program</h1>
           <p className="text-gray-700 leading-relaxed">
-            The Beaverton Rotary Foundation sponsors college, vocational, and CEYP scholarships
+            The <a href="https://www.beavertonrotary.org/beaverton-rotary-foundation/" className="text-blue-600 hover:underline" target="_blank">
+              Beaverton Rotary Foundation
+            </a>  sponsors college, vocational, and CEYP scholarships
             to Beaverton area students. Each year, the Foundation awards financial assistance to
             qualifying applicants who reside in the city of Beaverton or attended high school
             within the Beaverton School District.
@@ -59,7 +61,9 @@ export default function About() {
           <h2 className="text-lg font-semibold text-blue-800 mb-2">How to Apply</h2>
           <p className="text-sm text-gray-700 leading-relaxed">
             Applications are accepted during open scholarship windows, typically in the spring.
-            Create a free account to apply. You must reside in Beaverton or have attended a
+            Use the <a href="/login?tab=register" className="text-blue-600 hover:underline">
+              Register
+            </a> link to create a free account. You must reside in Beaverton or have attended a
             Beaverton School District high school to be eligible.
           </p>
         </div>

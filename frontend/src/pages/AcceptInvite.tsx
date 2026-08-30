@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import api from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function AcceptInvite() {
   const [searchParams] = useSearchParams()
@@ -10,6 +11,7 @@ export default function AcceptInvite() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { setSession } = useAuth()
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -18,8 +20,7 @@ export default function AcceptInvite() {
     setLoading(true)
     try {
       const res = await api.post('/auth/accept-invite', { token, password })
-      localStorage.setItem('token', res.data.access_token)
-      localStorage.setItem('role', res.data.role)
+      setSession(res.data.access_token, res.data.role, res.data.email)
       navigate('/review')
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
