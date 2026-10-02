@@ -32,8 +32,7 @@ export default function About() {
             <h3 className="font-semibold text-blue-700">Academic Renewal</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               Available to students who have previously received an Academic scholarship and are
-              continuing their college or university education. Renewal awards support up to three
-              additional years of study.
+              continuing their second year of study in Oregon. 
             </p>
           </div>
 
@@ -41,7 +40,7 @@ export default function About() {
             <h3 className="font-semibold text-blue-700">Vocational</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               Designed for students pursuing trade schools, beauty schools, or other vocational
-              programs. This scholarship supports career-focused education outside the traditional
+              programs in Oregon. This scholarship supports career-focused education outside the traditional
               four-year college path.
             </p>
           </div>
@@ -49,8 +48,8 @@ export default function About() {
           <div className="bg-white rounded-xl shadow p-6 space-y-2">
             <h3 className="font-semibold text-blue-700">CEYP — Continuing Education for Young Parents</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              A special scholarship for young women who had a child prior to graduating high school.
-              CEYP awards help recipients pursue education and career opportunities that provide
+              A special scholarship for young parents who had a child prior to graduating high school.
+              CEYP awards help recipients pursue education and career opportunities in Oregonthat provide
               stability for their families.
             </p>
           </div>
