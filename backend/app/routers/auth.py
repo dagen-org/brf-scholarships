@@ -1,18 +1,19 @@
 import secrets
+
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import create_access_token, hash_password, verify_password
 from app.db import users as users_db
 from app.models.user import (
-    RegisterRequest,
-    LoginRequest,
-    VerifyEmailRequest,
-    ResetPasswordRequest,
-    ConfirmResetRequest,
     AcceptInviteRequest,
+    ConfirmResetRequest,
+    LoginRequest,
+    RegisterRequest,
+    ResetPasswordRequest,
     UserRole,
+    VerifyEmailRequest,
 )
-from app.services.email import send_verification_email, send_password_reset_email
+from app.services.email import send_password_reset_email, send_verification_email
 
 router = APIRouter()
 
@@ -22,13 +23,15 @@ def bootstrap_admin(body: RegisterRequest):
     """Create the first admin user. Fails if any admin already exists."""
     if users_db.admin_exists():
         raise HTTPException(status_code=409, detail="Admin already exists")
-    users_db.create_user({
-        "email": body.email,
-        "hashed_password": hash_password(body.password),
-        "role": UserRole.admin,
-        "email_verified": True,
-        "verification_code": None,
-    })
+    users_db.create_user(
+        {
+            "email": body.email,
+            "hashed_password": hash_password(body.password),
+            "role": UserRole.admin,
+            "email_verified": True,
+            "verification_code": None,
+        }
+    )
     return {"message": "Admin account created"}
 
 
@@ -37,13 +40,15 @@ def register(body: RegisterRequest):
     if users_db.get_user(body.email):
         raise HTTPException(status_code=409, detail="Email already registered")
     code = f"{secrets.randbelow(900000) + 100000}"
-    users_db.create_user({
-        "email": body.email,
-        "hashed_password": hash_password(body.password),
-        "role": UserRole.applicant,
-        "email_verified": False,
-        "verification_code": code,
-    })
+    users_db.create_user(
+        {
+            "email": body.email,
+            "hashed_password": hash_password(body.password),
+            "role": UserRole.applicant,
+            "email_verified": False,
+            "verification_code": code,
+        }
+    )
     send_verification_email(body.email, code)
     return {"message": "Verification code sent to your email"}
 
@@ -53,7 +58,9 @@ def verify_email(body: VerifyEmailRequest):
     user = users_db.get_user(body.email)
     if not user or user.get("verification_code") != body.code:
         raise HTTPException(status_code=400, detail="Invalid verification code")
-    users_db.update_user(body.email, {"email_verified": True, "verification_code": None})
+    users_db.update_user(
+        body.email, {"email_verified": True, "verification_code": None}
+    )
     return {"message": "Email verified"}
 
 
@@ -61,9 +68,13 @@ def verify_email(body: VerifyEmailRequest):
 def login(body: LoginRequest):
     user = users_db.get_user(body.email)
     if not user or not verify_password(body.password, user["hashed_password"]):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+        )
     if not user.get("email_verified"):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Email not verified")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Email not verified"
+        )
     token = create_access_token(user["email"], user["role"])
     return {"access_token": token, "token_type": "bearer", "role": user["role"]}
 
@@ -84,10 +95,13 @@ def confirm_password_reset(body: ConfirmResetRequest):
     user = users_db.get_user(body.email)
     if not user or user.get("reset_code") != body.code:
         raise HTTPException(status_code=400, detail="Invalid reset code")
-    users_db.update_user(body.email, {
-        "hashed_password": hash_password(body.new_password),
-        "reset_code": None,
-    })
+    users_db.update_user(
+        body.email,
+        {
+            "hashed_password": hash_password(body.new_password),
+            "reset_code": None,
+        },
+    )
     return {"message": "Password updated"}
 
 
@@ -97,10 +111,18 @@ def accept_invite(body: AcceptInviteRequest):
     user = users_db.get_user_by_invite_token(body.token)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired invite token")
-    users_db.update_user(user["email"], {
-        "hashed_password": hash_password(body.password),
-        "email_verified": True,
-        "invite_token": None,
-    })
+    users_db.update_user(
+        user["email"],
+        {
+            "hashed_password": hash_password(body.password),
+            "email_verified": True,
+            "invite_token": None,
+        },
+    )
     token = create_access_token(user["email"], user["role"])
-    return {"access_token": token, "token_type": "bearer", "role": user["role"]}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "role": user["role"],
+        "email": user["email"],
+    }

@@ -1,6 +1,5 @@
-from datetime import datetime, timezone
-from typing import Optional
 import uuid
+from datetime import datetime, timezone
 
 from boto3.dynamodb.conditions import Key
 
@@ -11,7 +10,7 @@ def _pk(app_id: str) -> dict:
     return {"PK": f"APPLICATION#{app_id}", "SK": "METADATA"}
 
 
-def get_application(app_id: str) -> Optional[dict]:
+def get_application(app_id: str) -> dict | None:
     resp = get_table().get_item(Key=_pk(app_id))
     return resp.get("Item")
 
@@ -66,6 +65,10 @@ def update_application_data(app_id: str, data: dict) -> None:
     )
 
 
+def delete_application(app_id: str) -> None:
+    get_table().delete_item(Key=_pk(app_id))
+
+
 def update_application_status(app_id: str, status: str) -> None:
     get_table().update_item(
         Key=_pk(app_id),
@@ -80,13 +83,19 @@ def update_application_status(app_id: str, status: str) -> None:
 
 def get_comments(app_id: str) -> list[dict]:
     resp = get_table().query(
-        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}") & Key("SK").begins_with("COMMENT#"),
+        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}")
+        & Key("SK").begins_with("COMMENT#"),
     )
     return resp.get("Items", [])
 
 
 def add_file_record(
-    app_id: str, file_id: str, filename: str, s3_key: str, content_type: str, uploader: str
+    app_id: str,
+    file_id: str,
+    filename: str,
+    s3_key: str,
+    content_type: str,
+    uploader: str,
 ) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     item = {
@@ -106,20 +115,47 @@ def add_file_record(
 
 def get_files(app_id: str) -> list[dict]:
     resp = get_table().query(
-        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}") & Key("SK").begins_with("FILE#"),
+        KeyConditionExpression=Key("PK").eq(f"APPLICATION#{app_id}")
+        & Key("SK").begins_with("FILE#"),
     )
     return resp.get("Items", [])
 
 
-def add_comment(app_id: str, author_email: str, content: str) -> dict:
+def add_comment(
+    app_id: str, author_email: str, content: str, category: str = "comment"
+) -> dict:
+    comment_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     item = {
         "PK": f"APPLICATION#{app_id}",
-        "SK": f"COMMENT#{now}#{author_email}",
+        "SK": f"COMMENT#{comment_id}",
         "app_id": app_id,
+        "comment_id": comment_id,
         "author_email": author_email,
         "content": content,
+        "category": category,
         "created_at": now,
     }
     get_table().put_item(Item=item)
     return item
+
+
+def get_comment(app_id: str, comment_id: str) -> dict | None:
+    resp = get_table().get_item(
+        Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"}
+    )
+    return resp.get("Item")
+
+
+def update_comment(app_id: str, comment_id: str, content: str) -> None:
+    get_table().update_item(
+        Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"},
+        UpdateExpression="SET content = :content",
+        ExpressionAttributeValues={":content": content},
+    )
+
+
+def delete_comment(app_id: str, comment_id: str) -> None:
+    get_table().delete_item(
+        Key={"PK": f"APPLICATION#{app_id}", "SK": f"COMMENT#{comment_id}"}
+    )

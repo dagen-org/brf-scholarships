@@ -1,13 +1,12 @@
-from pydantic_settings import BaseSettings
 from pydantic import field_validator
-from typing import List
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     # Security
     secret_key: str = "dev-secret-change-in-production"
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 240
 
     # DynamoDB
     aws_region: str = "us-west-2"
@@ -28,13 +27,14 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:5173"
 
     # CORS
-    cors_origins: List[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:5173"]
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors(cls, v):
         if isinstance(v, str):
             import json
+
             return json.loads(v)
         return v
 

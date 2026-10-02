@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import Optional
 
 from boto3.dynamodb.conditions import Key
 
@@ -11,7 +10,7 @@ def _pk(email: str) -> dict:
     return {"PK": f"USER#{email}", "SK": "PROFILE"}
 
 
-def get_user(email: str) -> Optional[dict]:
+def get_user(email: str) -> dict | None:
     resp = get_table().get_item(Key=_pk(email))
     return resp.get("Item")
 
@@ -61,7 +60,7 @@ def delete_user(email: str) -> None:
     get_table().delete_item(Key=_pk(email))
 
 
-def get_user_by_invite_token(token: str) -> Optional[dict]:
+def get_user_by_invite_token(token: str) -> dict | None:
     resp = get_table().scan(
         FilterExpression="invite_token = :t",
         ExpressionAttributeValues={":t": token},

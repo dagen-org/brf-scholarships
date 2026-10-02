@@ -1,0 +1,20 @@
+{
+  "name": "brf-scholarships",
+  "version": "1.0.0",
+  "description": "Each year, the Beaverton Rotary Foundation accepts applications for scholarships.  There are 4 distinct types of scholarships available: Academic, Academic Renewal, CEYP, and Vocational.",
+  "homepage": "https://github.com/dagen-org/brf-scholarships#readme",
+  "bugs": {
+    "url": "https://github.com/dagen-org/brf-scholarships/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dagen-org/brf-scholarships.git"
+  },
+  "license": "ISC",
+  "author": "Damon Gentry",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
