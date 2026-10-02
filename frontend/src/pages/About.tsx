@@ -24,8 +24,7 @@ export default function About() {
             <h3 className="font-semibold text-blue-700">Academic</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               Awarded to graduating high school seniors planning to attend a college or university
-              in Oregon. Recipients may receive up to $6,000 per year, and awards are renewable
-              annually for up to four years.
+              in Oregon. Recipients may receive up to $3,000 for their first year of study.  Recipients may submit a renewal application in the second year of study for a maximum benefit of $6,000.
             </p>
           </div>
 
