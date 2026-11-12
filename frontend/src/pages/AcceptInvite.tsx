@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import Footer from '../components/Footer'
 import PublicNav from '../components/PublicNav'
 
 export default function AcceptInvite() {
@@ -68,6 +69,7 @@ export default function AcceptInvite() {
         </form>
       </div>
       </div>
+      <Footer />
     </div>
   )
 }
