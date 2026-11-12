@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from boto3.dynamodb.conditions import Key
 
@@ -24,7 +24,7 @@ def create_user(data: dict) -> dict:
         **_pk(data["email"]),
         "GSI1PK": f"ROLE#{_role_str(data['role'])}",
         "GSI1SK": f"USER#{data['email']}",
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
         **data,
     }
     get_table().put_item(Item=item)

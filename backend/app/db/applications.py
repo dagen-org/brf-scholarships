@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from boto3.dynamodb.conditions import Key
 
@@ -33,7 +33,7 @@ def get_applications_by_window(window_id: str) -> list[dict]:
 
 def create_application(owner_email: str, window_id: str, scholarship_type: str) -> dict:
     app_id = str(uuid.uuid4())
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     item = {
         **_pk(app_id),
         "GSI1PK": f"USER#{owner_email}",
@@ -60,7 +60,7 @@ def update_application_data(app_id: str, data: dict) -> None:
         ExpressionAttributeNames={"#d": "data"},
         ExpressionAttributeValues={
             ":data": data,
-            ":ts": datetime.now(timezone.utc).isoformat(),
+            ":ts": datetime.now(UTC).isoformat(),
         },
     )
 
@@ -76,7 +76,7 @@ def update_application_status(app_id: str, status: str) -> None:
         ExpressionAttributeNames={"#s": "status"},
         ExpressionAttributeValues={
             ":status": status,
-            ":ts": datetime.now(timezone.utc).isoformat(),
+            ":ts": datetime.now(UTC).isoformat(),
         },
     )
 
@@ -97,7 +97,7 @@ def add_file_record(
     content_type: str,
     uploader: str,
 ) -> dict:
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     item = {
         "PK": f"APPLICATION#{app_id}",
         "SK": f"FILE#{file_id}",
@@ -125,7 +125,7 @@ def add_comment(
     app_id: str, author_email: str, content: str, category: str = "comment"
 ) -> dict:
     comment_id = str(uuid.uuid4())
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     item = {
         "PK": f"APPLICATION#{app_id}",
         "SK": f"COMMENT#{comment_id}",
