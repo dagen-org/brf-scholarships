@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client'
-import { useAuth } from '../contexts/AuthContext'
 import Footer from '../components/Footer'
+import PublicNav from '../components/PublicNav'
 
 interface Window_ {
   window_id: string
@@ -62,7 +62,6 @@ function formatDate(iso: string) {
 }
 
 export default function ApplicantDashboard() {
-  const { email, logout } = useAuth()
   const navigate = useNavigate()
   const [activeWindow, setActiveWindow] = useState<Window_ | null>(null)
   const [myApps, setMyApps] = useState<Application[]>([])
@@ -101,13 +100,7 @@ export default function ApplicantDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <h1 className="text-lg font-bold text-blue-800">BRF Scholarships</h1>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-gray-500">{email}</span>
-          <button onClick={logout} className="text-red-500 hover:underline">Sign out</button>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-8">
 

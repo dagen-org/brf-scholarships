@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../api/client'
+import PublicNav from '../components/PublicNav'
 
 type Tab = 'login' | 'register'
 
@@ -49,7 +50,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <PublicNav />
+      <div className="flex-1 flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-xl shadow p-8">
         <h1 className="text-2xl font-bold text-center mb-6 text-blue-800">
           BRF Scholarships
@@ -110,6 +113,7 @@ export default function Login() {
         <p className="mt-6 text-center text-sm text-gray-400">
           <Link to="/" className="hover:text-blue-600">← Back to home</Link>
         </p>
+      </div>
       </div>
     </div>
   )

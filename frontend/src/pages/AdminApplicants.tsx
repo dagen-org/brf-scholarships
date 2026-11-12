@@ -1,8 +1,8 @@
 import { useEffect, useState, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
-import { useAuth } from '../contexts/AuthContext'
 import Footer from '../components/Footer'
+import PublicNav from '../components/PublicNav'
 
 interface Applicant {
   email: string
@@ -26,7 +26,6 @@ function formatDate(iso: string): string {
 }
 
 export default function AdminApplicants() {
-  const { email: adminEmail, logout } = useAuth()
   const [applicants, setApplicants] = useState<Applicant[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -117,14 +116,7 @@ export default function AdminApplicants() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <h1 className="text-lg font-bold text-blue-800">Beaverton Rotary Scholarships — Admin</h1>
-        <div className="flex items-center gap-4 text-sm">
-          <Link to="/" className="text-gray-600 hover:text-blue-700">Home</Link>
-          <span className="text-gray-500">{adminEmail}</span>
-          <button onClick={logout} className="text-red-500 hover:underline">Sign out</button>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-6">
         <div className="flex items-center gap-4">

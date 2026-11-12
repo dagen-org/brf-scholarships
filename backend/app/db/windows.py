@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from boto3.dynamodb.conditions import Key
 
@@ -52,7 +52,7 @@ def create_window(data: dict) -> dict:
         "GSI1PK": _gsi1pk(data["window_type"]),
         "GSI1SK": f"WINDOW#{window_id}",
         "window_id": window_id,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
         **data,
     }
     get_table().put_item(Item=item)
@@ -94,7 +94,7 @@ def unarchive_window(window_id: str) -> None:
 
 
 def get_active_live_window() -> dict | None:
-    today = datetime.now(timezone.utc).date().isoformat()
+    today = datetime.now(UTC).date().isoformat()
     resp = get_table().query(
         IndexName="GSI1",
         KeyConditionExpression=Key("GSI1PK").eq(_gsi1pk(WindowType.live.value)),

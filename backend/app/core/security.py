@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import bcrypt as _bcrypt
@@ -19,7 +19,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 def create_access_token(
     email: str, role: str, expires_delta: timedelta | None = None
 ) -> str:
-    expire = datetime.now(timezone.utc) + (
+    expire = datetime.now(UTC) + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
     payload = {"sub": email, "role": role, "exp": expire}

@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client'
+import PublicNav from '../components/PublicNav'
 
 export default function Bootstrap() {
   const [email, setEmail] = useState('')
@@ -25,7 +26,9 @@ export default function Bootstrap() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <PublicNav />
+      <div className="flex-1 flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-xl shadow p-8">
         <h1 className="text-2xl font-bold text-center mb-2 text-blue-800">BRF Scholarships</h1>
         <p className="text-sm text-gray-500 text-center mb-6">Create the first administrator account.</p>
@@ -55,6 +58,7 @@ export default function Bootstrap() {
             {loading ? 'Creating...' : 'Create Admin Account'}
           </button>
         </form>
+      </div>
       </div>
     </div>
   )

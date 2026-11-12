@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -67,7 +67,7 @@ def close_window_applications(window_id: str):
     window = windows_db.get_window(window_id)
     if not window:
         raise HTTPException(status_code=404, detail="Window not found")
-    today = datetime.now(timezone.utc).date().isoformat()
+    today = datetime.now(UTC).date().isoformat()
     if window["end_date"] >= today:
         raise HTTPException(status_code=400, detail="Window has not yet closed")
     apps = apps_db.get_applications_by_window(window_id)
@@ -111,7 +111,7 @@ def save_application_data(
     if (
         window
         and window.get("window_type") != "testing"
-        and datetime.now(timezone.utc).date().isoformat() > window["end_date"]
+        and datetime.now(UTC).date().isoformat() > window["end_date"]
     ):
         raise HTTPException(status_code=400, detail="Application window has closed")
     apps_db.update_application_data(app_id, body.data)
