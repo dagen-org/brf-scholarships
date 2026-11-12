@@ -49,7 +49,7 @@ export default function About() {
             <h3 className="font-semibold text-blue-700">CEYP — Continuing Education for Young Parents</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               A special scholarship for young parents who had a child prior to graduating high school.
-              CEYP awards help recipients pursue education and career opportunities in Oregonthat provide
+              CEYP awards help recipients pursue education and career opportunities in Oregon that provides
               stability for their families.
             </p>
           </div>

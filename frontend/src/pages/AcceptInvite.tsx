@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import PublicNav from '../components/PublicNav'
 
 export default function AcceptInvite() {
   const [searchParams] = useSearchParams()
@@ -31,7 +32,9 @@ export default function AcceptInvite() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <PublicNav />
+      <div className="flex-1 flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-xl shadow p-8">
         <h2 className="text-xl font-bold mb-2">Set your password</h2>
         <p className="text-sm text-gray-500 mb-6">
@@ -63,6 +66,7 @@ export default function AcceptInvite() {
             {loading ? 'Activating...' : 'Activate Account'}
           </button>
         </form>
+      </div>
       </div>
     </div>
   )

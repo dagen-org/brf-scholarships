@@ -10,7 +10,7 @@ Start the stack:
 ```
 make up       # start Docker services (DynamoDB Local, MinIO, MailHog)
 make setup    # create DynamoDB table + S3 bucket (first time only)
-make dev-backend   # uvicorn on :8080
+make dev-backend   # uvicorn on :8080   
 make dev-frontend  # Vite on :5173, proxies /api → :8080
 ```
 Bootstrap admin account at `http://localhost:5173/setup`.

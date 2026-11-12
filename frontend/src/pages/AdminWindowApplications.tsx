@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from '../components/Footer'
+import PublicNav from '../components/PublicNav'
 
 interface WindowItem {
   window_id: string
@@ -71,7 +72,7 @@ const SCHOLARSHIP_TYPES = [
 
 export default function AdminWindowApplications() {
   const { window_id } = useParams<{ window_id: string }>()
-  const { email, logout } = useAuth()
+  const { email } = useAuth()
   const navigate = useNavigate()
   const [window_, setWindow_] = useState<WindowItem | null>(null)
   const [applications, setApplications] = useState<Application[]>([])
@@ -126,14 +127,7 @@ export default function AdminWindowApplications() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <h1 className="text-lg font-bold text-blue-800">BRF Scholarships — Admin</h1>
-        <div className="flex items-center gap-4 text-sm">
-          <Link to="/" className="text-gray-600 hover:text-blue-700">Home</Link>
-          <span className="text-gray-500">{email}</span>
-          <button onClick={logout} className="text-red-500 hover:underline">Sign out</button>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className="flex-1 max-w-6xl mx-auto w-full p-6 space-y-6">
         <div className="flex items-center gap-4">

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from '../components/Footer'
+import PublicNav from '../components/PublicNav'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -542,11 +543,22 @@ function ResourcesSection({ data, set, readOnly }: SectionFormProps) {
   )
 }
 
+function EmailAttachmentsNote() {
+  return (
+    <p className="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+      If you don't have a file ready, such as a letter of recommendation, you may submit file attachments by email to{' '}
+      <a href="mailto:scholarships@beavertonrotary.org" className="text-blue-600 hover:underline">scholarships@beavertonrotary.org</a>.{' '}
+      If attachments are sent via email, please include the student's name in the body for the committee's review.
+    </p>
+  )
+}
+
 function FilesAcademicSection({ data, set, readOnly, appId, onFileUploaded, writingPrompt }: SectionFormProps) {
   const s = (k: string) => String(data[k] ?? '')
   const writingType = s('writing_sample_type') || 'file'
   return (
     <Section id="files" title="Files">
+      <EmailAttachmentsNote />
       <FileField label="High School Transcript" fieldKey="file_transcript" appId={appId} data={data} onFileUploaded={onFileUploaded} readOnly={readOnly} />
       <FileField label="Resume" fieldKey="file_resume" appId={appId} data={data} onFileUploaded={onFileUploaded} readOnly={readOnly} />
       <div>
@@ -577,6 +589,7 @@ function FilesAcademicSection({ data, set, readOnly, appId, onFileUploaded, writ
 function FilesRenewalSection({ data, readOnly, appId, onFileUploaded }: SectionFormProps) {
   return (
     <Section id="files" title="Files">
+      <EmailAttachmentsNote />
       <FileField label="Current Year Transcript" fieldKey="file_transcript" appId={appId} data={data} onFileUploaded={onFileUploaded} readOnly={readOnly} />
       <FileField label="Written Presentation" fieldKey="file_written_presentation" appId={appId} data={data} onFileUploaded={onFileUploaded} readOnly={readOnly} />
     </Section>
@@ -587,6 +600,7 @@ function FilesVocationalSection({ data, set, readOnly, appId, onFileUploaded }: 
   const s = (k: string) => String(data[k] ?? '')
   return (
     <Section id="files" title="Files & Essay">
+      <EmailAttachmentsNote />
       <FileField label="High School Transcript" fieldKey="file_transcript" appId={appId} data={data} onFileUploaded={onFileUploaded} readOnly={readOnly} />
       <Field label="Extracurricular and Personal Activities">
         <TA value={s('voc_activities')} onChange={v => set('voc_activities', v)} readOnly={readOnly} rows={4} />
@@ -954,12 +968,7 @@ export default function ApplicationForm() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Nav */}
-      <nav className="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-        <h1 className="text-lg font-bold text-blue-800">BRF Scholarships</h1>
-        <div className="flex items-center gap-4 text-sm text-gray-500">
-          <span>{email}</span>
-        </div>
-      </nav>
+      <PublicNav />
 
       <div className="flex-1 flex max-w-6xl mx-auto w-full px-4 py-6 gap-6">
 
