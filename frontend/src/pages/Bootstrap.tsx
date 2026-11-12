@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client'
+import Footer from '../components/Footer'
 import PublicNav from '../components/PublicNav'
 
 export default function Bootstrap() {
@@ -60,6 +61,7 @@ export default function Bootstrap() {
         </form>
       </div>
       </div>
+      <Footer />
     </div>
   )
 }

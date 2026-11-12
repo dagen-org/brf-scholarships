@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import api from '../api/client'
+import Footer from '../components/Footer'
 import PublicNav from '../components/PublicNav'
 
 export default function VerifyEmail() {
@@ -57,6 +58,7 @@ export default function VerifyEmail() {
         </form>
       </div>
       </div>
+      <Footer />
     </div>
   )
 }

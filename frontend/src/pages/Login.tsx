@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../api/client'
+import Footer from '../components/Footer'
 import PublicNav from '../components/PublicNav'
 
 type Tab = 'login' | 'register'
@@ -115,6 +116,7 @@ export default function Login() {
         </p>
       </div>
       </div>
+      <Footer />
     </div>
   )
 }
